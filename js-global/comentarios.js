@@ -33,7 +33,7 @@
   if(widgetAtual!==null&&global.turnstile){try{global.turnstile.remove(widgetAtual);}catch{}widgetAtual=null;}
   destino.replaceChildren();destino.hidden=true;
   try{
-   const resposta=await fetch('../configuracao-site.json');if(!resposta.ok)return;
+   const resposta=await fetch('../configuracao-site.json',{cache:'no-store'});if(!resposta.ok)return;
    const config=await resposta.json();if(vez!==sequencia||!permitido(config,obra,capitulo))return;
    const pagina=identidade(config,obra,capitulo),base=apiUrl(config);destino.hidden=false;destino.classList.add('comentarios-literature');
    destino.append(criar('h2',capitulo?'Comentários do capítulo':'Conversa sobre a obra'));

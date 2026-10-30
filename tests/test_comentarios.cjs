@@ -9,7 +9,7 @@ const all=w=>[w,...w.children.flatMap(all)];
  let config={schema_version:2,url_publica:'https://literatura.roger.cardoso.nom.br',comentarios:{ativado:true,api_url:'https://comments.example',turnstile_site_key:'public-site-key',obras:true,capitulos:true}};
  let posts=[],reads=0,fail=false,challenge=null,resets=0,gate=null;const drafts=new Map();
  const head=new Elemento('head'),ctx={window:{sessionStorage:{getItem:k=>drafts.get(k)||null,setItem:(k,v)=>drafts.set(k,v),removeItem:k=>drafts.delete(k)},confirm:()=>true},document:{createElement:t=>new Elemento(t),head},location:{origin:config.url_publica,protocol:'https:'},URL,URLSearchParams,AbortController,setTimeout,clearTimeout,crypto,fetch:async(url,opts={})=>{
-  if(url==='../configuracao-site.json')return {ok:true,json:async()=>config};
+  if(url==='../configuracao-site.json'){assert.equal(opts.cache,'no-store','Configuração atual é consultada sem usar cópia antiga');return {ok:true,json:async()=>config};}
   if(opts.method==='POST'){posts.push(JSON.parse(opts.body));return {ok:!fail,json:async()=>fail?{error:'Falha simulada'}:{status:'pending'}};}
   reads++;if(gate)await gate;return {ok:true,json:async()=>({items:[{id:'root-comment',author:'Leitor',body:'<script>não executar</script>',spoiler:1,created_at:1700000000000,parent_id:null}],next:null})};
  }};vm.createContext(ctx);vm.runInContext(fs.readFileSync('js-global/comentarios.js','utf8'),ctx);

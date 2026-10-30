@@ -9,7 +9,7 @@ const all=e=>[e,...e.children.flatMap(all)];
  const storage=new Map(),config={url_publica:'https://literatura.roger.cardoso.nom.br',comentarios:{ativado:false,api_url:'https://comments.example',turnstile_site_key:'public-key'},reacoes:{ativado:true,obras:true,capitulos:true}};
  let mine=0,verified=false,challengeCalls=0,writes=[],gate=null,blocked=false,paused=false,fail=false;
  const ctx={window:{localStorage:{getItem:k=>{if(blocked)throw Error();return storage.get(k)||null;},setItem:(k,v)=>{if(blocked)throw Error();storage.set(k,v);}},turnstile:{render(el,options){assert.equal(options.action,'reaction');challengeCalls++;options.callback('valid-token');return 'reaction-widget';},remove(){}},ComentariosLiterature:{identidade:(c,o,cap)=>({identifier:JSON.stringify(['literature',o.id_obra,cap?.id||null])}),carregarVerificacao:async()=>{}}},document:{createElement:t=>new Elemento(t)},location:{origin:config.url_publica,protocol:'https:'},URL,URLSearchParams,AbortController,setTimeout,clearTimeout,crypto,fetch:async(url,options={})=>{
-  if(url==='../configuracao-site.json')return {ok:true,json:async()=>config};
+  if(url==='../configuracao-site.json'){assert.equal(options.cache,'no-store','Configuração atual é consultada sem usar cópia antiga');return {ok:true,json:async()=>config};}
   const body=options.body?JSON.parse(options.body):null;
   if(url.endsWith('/state'))return {ok:true,json:async()=>({likes:mine===1?1:0,dislikes:mine===-1?1:0,mine,can_vote:verified,paused})};
   if(options.method==='POST'){

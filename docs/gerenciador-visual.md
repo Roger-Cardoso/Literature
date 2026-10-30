@@ -123,3 +123,7 @@ O cadastro da obra é a autoridade para personagens usados nas marcações. **En
 ## Biblioteca de obras
 
 Use **Obras** para gerenciar a coleção na mesma janela: criar, abrir a ficha, buscar, filtrar, arquivar, exportar fontes e excluir com recuperação. A restauração conserva as identidades e retorna a obra a rascunho. Leia o [guia completo](gerenciamento-obras.md), incluindo a diferença entre fontes privadas e pacote público.
+
+## Atualização do repositório
+
+A aba **Publicar no GitHub** prepara e revisa os arquivos públicos antes do envio, acompanha o Pages e pode sincronizar os comentários. A publicação utiliza a pasta gerenciada `publicado/`; fontes privadas e credenciais ficam locais. Consulte [o fluxo completo](publicar-pelo-studio.md).

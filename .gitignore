@@ -19,3 +19,8 @@ node_modules/
 
 exports/
 !backend/comentarios/.dev.vars.example
+
+# Destino e recibos de publicação do Studio (sem credenciais)
+.literature-studio.json
+.literature-publicacoes/
+publicado/

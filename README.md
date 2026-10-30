@@ -127,3 +127,7 @@ O botão **Obras** do Studio abre uma biblioteca com busca e filtro, metadados, 
 ## Comentários e publicação
 
 O botão **Site e comentários** configura os comentários próprios do Literature, com Cloudflare Workers e D1. Visitantes enviam nome e texto sem criar conta; todas as mensagens aguardam aprovação. O Studio oferece moderação, sincronização de discussões e exportação privada. A integração começa desativada até configurar o serviço. Veja [comentários próprios](docs/comentarios-proprios.md) e [implantação do backend](backend/comentarios/README.md).
+
+## Publicar pelo gerenciador
+
+O botão **Publicar no GitHub** permite preparar e revisar a saída pública, enviá-la ao repositório e acompanhar a implantação na mesma janela. Usa a autenticação do GitHub CLI, protege alterações externas e pode sincronizar os comentários após a aprovação. Veja [publicar pelo Studio](docs/publicar-pelo-studio.md).

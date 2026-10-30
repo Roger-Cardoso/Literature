@@ -4,6 +4,7 @@ from arvore_editorial import ArvoreEditorial
 from organizacao_visual import OrganizacaoMixin
 from obras_visual import ObrasMixin
 from site_visual import SiteMixin
+from publicacao_visual import PublicacaoMixin
 import hierarquia as hier
 from seletor_personagens import SeletorPersonagens
 from personagens_visual import PersonagensMixin,SeletorMarco
@@ -30,7 +31,7 @@ ENUMS={'comentarios':['herdar','ativado','desativado'],'tipo_semantico':['charac
 NOMES={'comentarios':'Comentários — herdar a configuração, ativar ou desativar','tipo_semantico':'Tipo semântico (character ou creature)','id':'Identidade permanente','id_obra':'Identidade permanente','titulo':'Título','titulo_cena':'Identificação pública da cena','estado_publicacao':'Publicação','estado_obra':'Andamento da obra','publicado_em':'Primeira publicação (AAAA-MM-DD)','atualizado_em':'Atualização (AAAA-MM-DD)','avisos_conteudo':'Avisos de conteúdo — um por linha','sinopse':'Sinopse','ancora':'Âncora no texto','relevancia':'Relevância narrativa','avaliacao_conteudo':'Avaliação de conteúdo','consequencia_pular':'Consequência de pular — spoiler','resumo_alternativo':'Resumo alternativo — spoiler','descricao':'Descrição — spoiler quando for cena','tratamento':'Como o conteúdo é apresentado','ordem':'Ordem no grupo — altere em Organizar capítulos','src':'Arquivo ou endereço da imagem','alt':'Descrição alternativa da imagem','disponivel_apos_capitulo':'Disponível após concluir (ID do capítulo)','verbetes_ids':'Verbetes associados — um ID por linha','personagens_ids':'Participações — selecione personagens cadastrados na obra'}
 LISTAS={'tags','temas','generos','avisos_conteudo','aliases','verbetes_ids','personagens_ids'}
 LONGOS={'sinopse','descricao','descricao_curta','texto','consequencia_pular','resumo_alternativo','tratamento'}
-class Studio(SiteMixin,ObrasMixin,PersonagensMixin,OrganizacaoMixin,tk.Tk):
+class Studio(PublicacaoMixin,SiteMixin,ObrasMixin,PersonagensMixin,OrganizacaoMixin,tk.Tk):
  def __init__(self):
   super().__init__();self.title('Literature Studio — gestão local');self.geometry('1180x800');self.minsize(850,600)
   self.projeto=Projeto();self.atual=None;self.widgets={};self.base=None;self.server=None;self.eventos=queue.Queue();self.ocupado=False;self.itens={};self.editor=None;self.editor_chave=None;self.overlay_stack=[]
@@ -41,7 +42,7 @@ class Studio(SiteMixin,ObrasMixin,PersonagensMixin,OrganizacaoMixin,tk.Tk):
   for texto,cmd in [('Validar',lambda:self.tarefa('Validar',lambda:preparar(ROOT))),('Gerar site',lambda:self.tarefa('Gerar',lambda:gerar(ROOT))),('Prévia',self.previa),('Pacote de publicação',self.pacote)]:ttk.Button(topo,text=texto,command=cmd).pack(side='left',padx=5)
   barra=ttk.Frame(self,padding=(15,0));barra.pack(fill='x')
   botoes=[]
-  for texto,cmd in [('Site e comentários',self.configurar_site),('Obras',self.gerenciar_obras),('Nova obra',self.nova_obra),('Novo capítulo',self.novo_capitulo),('Organizar capítulos',self.organizar_estrutura),('Personagens',self.gerenciar_personagens),('Novo recurso',self.novo_recurso),('Editor semântico',self.editor_semantico),('Salvar',self.salvar_sessao),('Recarregar',self.recarregar),('Estrutura avançada',self.avancado),('Backups',self.backups)]:botoes.append(ttk.Button(barra,text=texto,command=cmd))
+  for texto,cmd in [('Publicar no GitHub',self.gerenciar_publicacao),('Site e comentários',self.configurar_site),('Obras',self.gerenciar_obras),('Nova obra',self.nova_obra),('Novo capítulo',self.novo_capitulo),('Organizar capítulos',self.organizar_estrutura),('Personagens',self.gerenciar_personagens),('Novo recurso',self.novo_recurso),('Editor semântico',self.editor_semantico),('Salvar',self.salvar_sessao),('Recarregar',self.recarregar),('Estrutura avançada',self.avancado),('Backups',self.backups)]:botoes.append(ttk.Button(barra,text=texto,command=cmd))
   def distribuir(event=None):
    colunas=max(1,min(len(botoes),(event.width if event else 1100)//150))
    for i,botao in enumerate(botoes):botao.grid(row=i//colunas,column=i%colunas,sticky='ew',padx=3,pady=3)
@@ -382,6 +383,9 @@ class Studio(SiteMixin,ObrasMixin,PersonagensMixin,OrganizacaoMixin,tk.Tk):
   if not self.salvar_autoria():return
   if self.ocupado:messagebox.showinfo('Aguarde','Aguarde a operação em andamento.',parent=self);return
   if not self.continuar():return
+  if hasattr(self,'pagina_publicacao'):
+   self.pagina_publicacao.cancelar_auth()
+   if self.pagina_publicacao.pacote:self.pagina_publicacao.pacote.fechar()
   if self.server:threading.Thread(target=self.server.shutdown,daemon=True).start()
   self.destroy()
 

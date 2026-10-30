@@ -1,3 +1,4 @@
+# literature-studio-snapshot-v1
 name: Publicar literatura
 on:
   push:
@@ -33,11 +34,21 @@ jobs:
       - run: node tests/test_contexto.cjs
       - run: node tests/test_guia.cjs
       - run: node tests/test_comentarios.cjs
-      - run: python scripts/gerar_site.py
+      - name: Conferir versão pública do Studio
+        id: fonte
+        shell: bash
+        run: |
+          if [ -d publicado ]; then
+            python scripts/verificar_publicacao.py publicado
+            echo "pasta=publicado" >> "$GITHUB_OUTPUT"
+          else
+            python scripts/gerar_site.py
+            echo "pasta=site" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: ${{ steps.fonte.outputs.pasta }}
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4

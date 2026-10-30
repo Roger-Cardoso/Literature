@@ -35,3 +35,8 @@ class ClienteComentariosTest(unittest.TestCase):
   ident='9d272cf6-5273-4b98-8ea4-5456bbb93c85';c.classificar_spoiler(ident,True);self.assertEqual(c.chamar.call_args.args[2],{'spoiler':True})
   with self.assertRaises(ValueError):c.listar(busca='a'*101)
   with self.assertRaises(ValueError):c.classificar_spoiler(ident,'false')
+
+ def test_reacoes_paginadas_pausa_e_exportacao_sem_identificadores(self):
+  c=ClienteComentarios('https://comments.example','s'*40);c.chamar=Mock(return_value={});c.pausar_reacoes('["literature","obra",null]',True);self.assertEqual(c.chamar.call_args.args[2]['paused'],True)
+  with self.assertRaises(ValueError):c.pausar_reacoes('obra',1)
+  c.reacoes=Mock(side_effect=[{'items':[{'likes':2,'dislikes':1}],'next':'cap-1'},{'items':[{'likes':5,'dislikes':0}],'next':None}]);dados=c.exportar_reacoes();self.assertEqual(len(dados['reacoes']),2);self.assertEqual(dados['escopo'],'catalogo_sincronizado');self.assertNotIn('s'*40,json.dumps(dados))

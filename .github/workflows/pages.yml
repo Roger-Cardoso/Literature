@@ -33,6 +33,7 @@ jobs:
       - run: node tests/test_semantica.cjs
       - run: node tests/test_contexto.cjs
       - run: node tests/test_guia.cjs
+      - run: node tests/test_reacoes.cjs
       - run: node tests/test_comentarios.cjs
       - name: Conferir versão pública do Studio
         id: fonte

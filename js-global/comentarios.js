@@ -138,5 +138,5 @@
    };
   }catch{destino.hidden=true;}
  }
- global.ComentariosLiterature={montar,permitido,identidade};
+ global.ComentariosLiterature={montar,permitido,identidade,carregarVerificacao:carregarTurnstile};
 })(window);

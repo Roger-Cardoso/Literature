@@ -50,3 +50,18 @@ class ClienteComentarios:
    if seguinte<=after:raise ValueError('Paginação inválida no serviço.')
    after=seguinte
   return {'schema_version':1,'comentarios':itens}
+
+ def reacoes(self,depois='',busca=''):
+  if len(busca)>100:raise ValueError('Use até 100 caracteres na busca.')
+  return self.chamar('/v1/admin/reactions?'+parse.urlencode({'cursor':depois,'q':busca,'limit':50}))
+ def pausar_reacoes(self,thread,pausado):
+  if type(pausado) is not bool:raise ValueError('Informe se deseja pausar.')
+  return self.chamar('/v1/admin/reactions','PATCH',{'thread':thread,'paused':pausado})
+ def exportar_reacoes(self):
+  itens=[];after=''
+  while True:
+   pagina=self.reacoes(after);itens.extend(pagina['items']);seguinte=pagina.get('next')
+   if seguinte is None:break
+   if not isinstance(seguinte,str) or seguinte<=after:raise ValueError('Paginação inválida no serviço.')
+   after=seguinte
+  return {'schema_version':1,'escopo':'catalogo_sincronizado','reacoes':itens}

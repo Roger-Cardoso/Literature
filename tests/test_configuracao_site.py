@@ -30,3 +30,16 @@ class ConfiguracaoSiteTest(unittest.TestCase):
   manifesto=manifesto_comentarios(config,resultados);self.assertEqual(len(manifesto['threads']),2)
   antigo=manifesto['threads'][1]['id'];cap['titulo']='Novo título';self.assertEqual(manifesto_comentarios(config,resultados)['threads'][1]['id'],antigo)
   info['comentarios']='desativado';cap['comentarios']='ativado';self.assertEqual(manifesto_comentarios(config,resultados)['threads'],[])
+
+ def test_reacoes_independentes_dos_comentarios_e_flags_do_manifesto(self):
+  from configuracao_site import reacoes_permitidas,validar_opcao
+  config=copy.deepcopy(PADRAO);config['reacoes']['ativado']=True;config['comentarios'].update(api_url='https://comments.example',turnstile_site_key='public-key');validar(config)
+  info={'id_obra':'obra','titulo':'Obra','comentarios':'desativado'};cap={'id':'cap','titulo':'Capítulo'}
+  estrutura={'sagas':[{'volumes':[{'arcos':[{'capitulos':[cap]}]}]}]};manifesto=manifesto_comentarios(config,[('slug',info,estrutura,[])])
+  self.assertEqual(len(manifesto['threads']),2);self.assertTrue(all(t['reactions_enabled'] and not t['comments_enabled'] for t in manifesto['threads']))
+  info['reacoes']='desativado';cap['reacoes']='ativado';self.assertFalse(reacoes_permitidas(config,info,cap));self.assertEqual(manifesto_comentarios(config,[('slug',info,estrutura,[])])['threads'],[])
+  with self.assertRaises(ValueError):validar_opcao({'reacoes':'talvez'},'Capítulo')
+  config['reacoes']['obras']='true'
+  with self.assertRaises(ValueError):validar(config)
+ def test_configuracao_antiga_mantem_reacoes_desativadas(self):
+  config=copy.deepcopy(PADRAO);config.pop('reacoes');self.assertFalse(validar(config)['reacoes']['ativado'])

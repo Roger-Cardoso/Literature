@@ -7,5 +7,10 @@
     "turnstile_site_key": "0x4AAAAAAFtOoANhjiZKY2sp",
     "obras": true,
     "capitulos": true
+  },
+  "reacoes": {
+    "ativado": true,
+    "obras": true,
+    "capitulos": true
   }
 }

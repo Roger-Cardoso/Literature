@@ -127,3 +127,7 @@ Use **Obras** para gerenciar a coleção na mesma janela: criar, abrir a ficha, 
 ## Atualização do repositório
 
 A aba **Publicar no GitHub** prepara e revisa os arquivos públicos antes do envio, acompanha o Pages e pode sincronizar os comentários. A publicação utiliza a pasta gerenciada `publicado/`; fontes privadas e credenciais ficam locais. Consulte [o fluxo completo](publicar-pelo-studio.md).
+
+### Reações dos leitores
+
+Em **Site e comentários → Gerenciar reações**, consulte Gostei, Não gostei e o total de votos de cada obra/capítulo, busque títulos, pause ou retome as reações e exporte os totais. Use a mesma credencial privada da moderação. A ativação global e os padrões ficam em Site e comentários; a ficha de cada obra e capítulo oferece o campo Reações. Veja [o guia de reações](reacoes.md).

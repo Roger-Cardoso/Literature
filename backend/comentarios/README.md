@@ -86,3 +86,9 @@ O arquivo `.dev.vars` e a pasta `.wrangler` são locais e ignorados pelo Git. N�
 Antes de implantar esta versão do Worker, aplique as migrações pendentes com `npx wrangler d1 migrations apply literature-comments --remote`, nesta pasta. A migração `0002_spoilers.sql` acrescenta campos às mensagens existentes sem apagá-las. Em seguida, use `npx wrangler deploy`. Só publique a interface atualizada após concluir essa atualização do serviço.
 
 A escolha original de spoiler é preservada separadamente da classificação moderada para que uma nova tentativa do mesmo envio continue idempotente após a revisão. A consulta pública também protege respostas quando o comentário original está sinalizado. A busca administrativa aceita texto literal com até 100 caracteres e um identificador exato de discussão; ambos são parâmetros SQL. Não há alteração dos nomes ou textos dos comentários existentes.
+
+### Reações por obra e capítulo
+
+A migração `0003_reactions.sql` cria votos, contadores transacionais, pausas e autorizações temporárias; comentários existentes permanecem intactos. Aplique-a antes de implantar o Worker atualizado. O manifesto aceita `comments_enabled` e `reactions_enabled` independentes; manifestos antigos habilitam apenas comentários.
+
+`GET /v1/reactions?thread=…` retorna totais públicos. `POST /v1/reactions/state` consulta a reação do identificador enviado no corpo. `POST /v1/reactions` recebe `value` 1, -1 ou 0 (retirada), exigindo verificação Turnstile com ação `reaction` quando a conexão ainda não estiver autorizada. As rotas administrativas `/v1/admin/reactions` consultam totais e aplicam pausas, com o mesmo bearer privado. Veja [o guia completo](../../docs/reacoes.md).

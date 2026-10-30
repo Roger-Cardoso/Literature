@@ -3,7 +3,8 @@ import json
 from urllib.parse import urlsplit
 
 COMENTARIOS={'ativado':False,'api_url':'','turnstile_site_key':'','obras':True,'capitulos':True}
-PADRAO={'schema_version':2,'url_publica':'https://literatura.roger.cardoso.nom.br','comentarios':COMENTARIOS.copy()}
+REACOES={'ativado':False,'obras':True,'capitulos':True}
+PADRAO={'schema_version':2,'url_publica':'https://literatura.roger.cardoso.nom.br','comentarios':COMENTARIOS.copy(),'reacoes':REACOES.copy()}
 
 def origem_https(url):
     if not isinstance(url,str):raise ValueError('Endereço inválido.')
@@ -23,7 +24,10 @@ def validar(config,cname=None):
     if api:api=origem_https(api)
     if key and (not key.isascii() or not all(x.isalnum() or x in '_-' for x in key) or len(key)>100):raise ValueError('Chave pública do Turnstile inválida.')
     if c['ativado'] and (not api or not key):raise ValueError('Informe a URL do Worker e a chave pública do Turnstile antes de ativar.')
-    return {'schema_version':2,'url_publica':url,'comentarios':{'ativado':c['ativado'],'api_url':api,'turnstile_site_key':key,'obras':c['obras'],'capitulos':c['capitulos']}}
+    r=config.get('reacoes',REACOES.copy())
+    if not isinstance(r,dict) or any(type(r.get(k)) is not bool for k in REACOES):raise ValueError('Informe as opções de reações como verdadeiro ou falso.')
+    if r['ativado'] and (not api or not key):raise ValueError('Informe a URL do Worker e a chave pública do Turnstile antes de ativar as reações.')
+    return {'reacoes':{k:r[k] for k in REACOES},'schema_version':2,'url_publica':url,'comentarios':{'ativado':c['ativado'],'api_url':api,'turnstile_site_key':key,'obras':c['obras'],'capitulos':c['capitulos']}}
 
 def carregar(root):
     arquivo=root/'configuracao-site.json'
@@ -31,12 +35,18 @@ def carregar(root):
     return validar(config,(root/'CNAME').read_text(encoding='utf-8').strip())
 
 def validar_opcao(obj,contexto):
-    if obj.get('comentarios','herdar') not in {'herdar','ativado','desativado'}:raise ValueError(contexto+': opção de comentários inválida.')
+    for campo in ('comentarios','reacoes'):
+        if obj.get(campo,'herdar') not in {'herdar','ativado','desativado'}:raise ValueError(contexto+': opção de '+campo+' inválida.')
 
 def comentarios_permitidos(config,obra,capitulo=None):
     c=config['comentarios']
     if not c['ativado'] or obra.get('comentarios')=='desativado' or capitulo and capitulo.get('comentarios')=='desativado':return False
     return (capitulo or obra).get('comentarios')=='ativado' or c['capitulos' if capitulo else 'obras']
+
+def reacoes_permitidas(config,obra,capitulo=None):
+    r=config.get('reacoes',REACOES)
+    if not r['ativado'] or obra.get('reacoes')=='desativado' or capitulo and capitulo.get('reacoes')=='desativado':return False
+    return (capitulo or obra).get('reacoes')=='ativado' or r['capitulos' if capitulo else 'obras']
 
 def manifesto_comentarios(config,resultados):
     from urllib.parse import urlencode
@@ -45,11 +55,11 @@ def manifesto_comentarios(config,resultados):
         def incluir(cap=None):
             ident=json.dumps(['literature',info['id_obra'],cap['id'] if cap else None],ensure_ascii=False,separators=(',',':'))
             url=config['url_publica']+'/'+slug+('/leitor.html?'+urlencode({'id':cap['id']}) if cap else '/index-obra.html')
-            threads.append({'id':ident,'title':cap['titulo']+' — '+info['titulo'] if cap else info['titulo'],'url':url})
-        if comentarios_permitidos(config,info):incluir()
+            threads.append({'id':ident,'title':cap['titulo']+' — '+info['titulo'] if cap else info['titulo'],'url':url,'comments_enabled':comentarios_permitidos(config,info,cap),'reactions_enabled':reacoes_permitidas(config,info,cap)})
+        if comentarios_permitidos(config,info) or reacoes_permitidas(config,info):incluir()
         for s in estrutura['sagas']:
             for v in s['volumes']:
                 for a in v['arcos']:
                     for cap in a['capitulos']:
-                        if comentarios_permitidos(config,info,cap):incluir(cap)
+                        if comentarios_permitidos(config,info,cap) or reacoes_permitidas(config,info,cap):incluir(cap)
     return {'schema_version':1,'threads':threads}

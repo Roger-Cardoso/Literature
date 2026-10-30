@@ -109,3 +109,45 @@ test('migração preserva mensagens anteriores com proteção inicialmente desma
  const antes=sql.prepare('SELECT * FROM comments').get();sql.exec(readFileSync(new URL('../migrations/0002_spoilers.sql',import.meta.url),'utf8'));const depois=sql.prepare('SELECT * FROM comments').get();
  for(const key of Object.keys(antes))assert.equal(depois[key],antes[key]);assert.equal(depois.spoiler,0);assert.equal(depois.submitted_spoiler,0);sql.close();
 });
+async function reactionsFixture(){
+ const f=await fixture(),generation=crypto.randomUUID();
+ await f.call('/v1/admin/threads','POST',{generation,threads:[{id:thread,title:'Capítulo com reações',url:ORIGIN+'/obra-1/leitor.html?id=cap-1',comments_enabled:false,reactions_enabled:true}]},true);
+ await f.call('/v1/admin/threads/commit','POST',{generation,total:1},true);
+ const visitor=crypto.randomUUID();const vote=(value,extra={})=>f.call('/v1/reactions','POST',{thread,visitor,value,turnstile_token:'valid-token',...extra});
+ const totals=()=>f.call('/v1/reactions?thread='+encodeURIComponent(thread)).then(r=>r.json());
+ return {...f,visitor,vote,totals};
+}
+test('reações: um voto, repetição idempotente, troca, remoção e contadores transacionais',async()=>{
+ const f=await reactionsFixture();assert.equal((await f.publicComments()).error,'Discussão indisponível.');assert.equal((await f.submit()).status,404,'Reações não habilitam comentários');
+ assert.equal((await f.vote(1)).status,200);assert.equal((await f.vote(1)).status,200);assert.deepEqual(await f.totals(),{likes:1,dislikes:0,paused:false});
+ const id=crypto.randomUUID();await f.vote(-1,{visitor:id});assert.deepEqual(await f.totals(),{likes:1,dislikes:1,paused:false});
+ await f.vote(-1);assert.deepEqual(await f.totals(),{likes:0,dislikes:2,paused:false});await f.vote(0);await f.vote(0);assert.deepEqual(await f.totals(),{likes:0,dislikes:1,paused:false});
+ const state=await f.call('/v1/reactions/state','POST',{thread,visitor:id}).then(r=>r.json());assert.equal(state.mine,-1);assert.equal(state.can_vote,true);
+ const rows=f.env.DB.sql.prepare('SELECT * FROM reactions').all();assert.equal(rows.length,1);assert.ok(!JSON.stringify(rows).includes(id));assert.ok(!JSON.stringify(rows).includes('203.0.113.10'));
+});
+test('reações: verificação por conexão expira e não vale para outro visitante',async()=>{
+ const f=await reactionsFixture();assert.equal((await f.vote(1,{turnstile_token:null})).status,403);assert.equal((await f.vote(1,{turnstile_token:'invalid'})).status,403);assert.equal((await f.vote(1)).status,200);
+ assert.equal((await f.vote(-1,{turnstile_token:null})).status,200);assert.equal((await f.vote(1,{visitor:crypto.randomUUID(),turnstile_token:null})).status,403);
+ const otherIP=await f.call('/v1/reactions','POST',{thread,visitor:f.visitor,value:1},false,{'CF-Connecting-IP':'203.0.113.11'});assert.equal(otherIP.status,403);
+ f.advance(600001);assert.equal((await f.vote(1,{turnstile_token:null})).status,403);
+});
+test('reações: pausa, autenticação, catálogo independente e retenção após desativação',async()=>{
+ const f=await reactionsFixture();await f.vote(1);assert.equal((await f.call('/v1/admin/reactions','PATCH',{thread,paused:true})).status,401);
+ await f.call('/v1/admin/reactions','PATCH',{thread,paused:true},true);assert.equal((await f.vote(-1)).status,409);assert.equal((await f.totals()).likes,1);assert.equal((await f.totals()).paused,true);
+ await f.call('/v1/admin/reactions','PATCH',{thread,paused:false},true);assert.equal((await f.vote(-1)).status,200);
+ const generation=crypto.randomUUID();await f.call('/v1/admin/threads','POST',{generation,threads:[{id:thread,title:'Renomeado',url:ORIGIN+'/obra-1/index-obra.html',reactions_enabled:false}]},true);await f.call('/v1/admin/threads/commit','POST',{generation,total:1},true);
+ assert.equal((await f.call('/v1/reactions?thread='+encodeURIComponent(thread))).status,404);assert.equal((await f.vote(1)).status,404);
+ const admin=await f.call('/v1/admin/reactions?q=renomeado','GET',null,true).then(r=>r.json());assert.equal(admin.items[0].dislikes,1);assert.equal(admin.items[0].reactions_enabled,0);assert.ok(!JSON.stringify(admin).includes(f.visitor));
+});
+test('reações: valores e origem inválidos, limite por conexão e ação específica Turnstile',async()=>{
+ const f=await reactionsFixture();for(const value of [2,'1',null,true])assert.equal((await f.vote(value)).status,400);
+ assert.equal((await f.call('/v1/reactions','POST',{thread,visitor:f.visitor,value:1},false,{Origin:'https://outro.example'})).status,403);
+ for(let i=0;i<60;i++)assert.equal((await f.vote(i%2?1:-1)).status,200);assert.equal((await f.vote(1)).status,429);
+ const other=await reactionsFixture();let action;const worker=createWorker({verify:async(_t,_ip,_env,a)=>{action=a;return true;}});
+ await worker.fetch(new Request('https://comments.example/v1/reactions',{method:'POST',headers:{Origin:ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'203.0.113.10'},body:JSON.stringify({thread,visitor:other.visitor,value:1,turnstile_token:'token'})}),other.env);assert.equal(action,'reaction');
+});
+test('migração de reações não altera os comentários e conserva compatibilidade das discussões',()=>{
+ const db=new DatabaseSync(':memory:');for(const name of ['0001_comments.sql','0002_spoilers.sql'])db.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8'));
+ const generation=crypto.randomUUID();db.prepare('INSERT INTO generations VALUES (?,?)').run(generation,1);db.prepare('INSERT INTO threads VALUES (?,?,?,?)').run(generation,thread,'Capítulo',ORIGIN+'/obra');
+ db.exec(readFileSync(new URL('../migrations/0003_reactions.sql',import.meta.url),'utf8'));const row=db.prepare('SELECT * FROM threads').get();assert.equal(row.comments_enabled,1);assert.equal(row.reactions_enabled,0);db.close();
+});

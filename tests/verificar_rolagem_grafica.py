@@ -12,7 +12,7 @@ import integracao_semantica as integ
 from gestao_projeto import Projeto
 from fixture_projeto import preparar_fixture
 temporario=tempfile.TemporaryDirectory();destino=Path(temporario.name)/'projeto'
-shutil.copytree(Path(__file__).resolve().parents[1],destino,ignore=shutil.ignore_patterns('.git','.agents','.aws','.codex','.literature-backups','.literature-lixeira','__pycache__','site'))
+shutil.copytree(Path(__file__).resolve().parents[1],destino,ignore=shutil.ignore_patterns('node_modules','.wrangler','.literature-lixeira','.git','.agents','.aws','.codex','.literature-backups','.literature-lixeira','__pycache__','site'))
 preparar_fixture(destino)
 from gerar_site import gerar
 gerar(destino)

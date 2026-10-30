@@ -10,7 +10,7 @@ from fixture_projeto import preparar_fixture
 class MetadadosTest(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.root=Path(self.tmp.name)/'projeto'
-        shutil.copytree(ROOT,self.root,ignore=shutil.ignore_patterns('site','.git','.agents','.codex','.aws','__pycache__','.literature-backups','.unilit-build-*'))
+        shutil.copytree(ROOT,self.root,ignore=shutil.ignore_patterns('node_modules','.wrangler','.literature-lixeira','site','.git','.agents','.codex','.aws','__pycache__','.literature-backups','.unilit-build-*'))
         preparar_fixture(self.root)
         self.path=self.root/'obra-1/dados/editorial.json';self.tree=json.loads(self.path.read_text())
         # Obra fictícia fixa: a suíte não depende dos capítulos reais do autor.

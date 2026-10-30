@@ -1,0 +1,5 @@
+# Copie somente para desenvolvimento local. Não publique este arquivo com segredos reais.
+# Os exemplos abaixo são deliberadamente curtos/incompletos e não habilitam envios.
+ADMIN_TOKEN="substitua"
+IP_HASH_SECRET="substitua"
+TURNSTILE_SECRET_KEY=""

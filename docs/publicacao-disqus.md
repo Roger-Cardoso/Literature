@@ -1,3 +1,7 @@
+# Histórico: integração Disqus substituída
+
+A integração ativa foi substituída por comentários próprios com Cloudflare Workers e D1. Não é necessário criar fórum no Disqus ou contratar esse serviço. Consulte [o guia atual](comentarios-proprios.md). As instruções de domínio/GitHub Pages abaixo continuam úteis; a configuração de comentários Disqus é apenas histórica.
+
 # Publicação do Literature e comentários
 
 Destino: `Roger-Cardoso/Literature`. Endereço: `https://literatura.roger.cardoso.nom.br/home/`.

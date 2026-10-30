@@ -1,0 +1,14 @@
+{
+  "name": "literature-comments",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/worker.test.mjs",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "migrate:local": "wrangler d1 migrations apply literature-comments --local",
+    "migrate:remote": "wrangler d1 migrations apply literature-comments --remote"
+  },
+  "devDependencies": {"wrangler": "^4.0.0"},
+  "engines": {"node": ">=22.13"}
+}

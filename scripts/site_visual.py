@@ -1,34 +1,35 @@
-"""Configuração de publicação e comentários na janela do Studio."""
-import copy
+"""Configuração de publicação e comentários próprios na janela do Studio."""
 import tkinter as tk
 from tkinter import ttk,messagebox
 from configuracao_site import carregar,validar
 from editor_componente import OverlayPanel
 from gerar_site import preparar
+from moderacao_visual import ModeracaoMixin
 
-class SiteMixin:
+class SiteMixin(ModeracaoMixin):
  def configurar_site(self):
   if not self.continuar():return
   try:
-   config=carregar(self.projeto.root);_,rev=(self.projeto.ler('configuracao-site.json') if (self.projeto.root/'configuracao-site.json').exists() else (None,None))
-   painel=OverlayPanel(self,'Site e comentários',width=800,height=690,scrollable=True)
-   ttk.Label(painel.body,text='Publicação estática e comentários externos',font=('Georgia',19)).pack(anchor='w',pady=10)
-   ttk.Label(painel.body,text='Endereço HTTPS público — deve corresponder ao CNAME').pack(anchor='w');url=ttk.Entry(painel.body);url.insert(0,config['url_publica']);url.pack(fill='x',pady=5)
-   ativo=tk.BooleanVar(value=config['disqus']['ativado']);obras=tk.BooleanVar(value=config['disqus']['obras']);capitulos=tk.BooleanVar(value=config['disqus']['capitulos'])
-   ttk.Checkbutton(painel.body,text='Ativar integração com o Disqus',variable=ativo).pack(anchor='w',pady=10)
-   ttk.Label(painel.body,text='Shortname do Disqus — somente o nome antes de .disqus.com').pack(anchor='w');short=ttk.Entry(painel.body);short.insert(0,config['disqus']['shortname']);short.pack(fill='x',pady=5)
-   ttk.Checkbutton(painel.body,text='Comentários nas páginas das obras, por padrão',variable=obras).pack(anchor='w',pady=5)
-   ttk.Checkbutton(painel.body,text='Comentários nos capítulos, por padrão',variable=capitulos).pack(anchor='w',pady=5)
-   ttk.Label(painel.body,text='Cada obra e capítulo pode herdar a configuração, ativar ou desativar comentários na ficha. Desativar na obra também bloqueia seus capítulos. O serviço só carrega após o leitor clicar; prévias locais e versões offline não carregam o Disqus. O plano gratuito pode exibir anúncios.',wraplength=650).pack(anchor='w',pady=12)
-   ttk.Label(painel.body,text='Cadastre o domínio literatura.roger.cardoso.nom.br no Disqus, informe-o nos domínios confiáveis e use o shortname fornecido. Este formulário não cria contas nem altera DNS. Depois de salvar, gere o site novamente.',wraplength=650).pack(anchor='w',pady=10)
-   estado=tk.StringVar(value='Conferindo preparação local…');ttk.Label(painel.body,textvariable=estado,wraplength=650).pack(anchor='w',pady=10)
+   config=carregar(self.projeto.root);_,rev=(self.projeto.ler('configuracao-site.json') if (self.projeto.root/'configuracao-site.json').exists() else (None,None));c=config['comentarios']
+   painel=OverlayPanel(self,'Site e comentários',width=800,height=730,scrollable=True)
+   ttk.Label(painel.body,text='Comentários do Literature',font=('Georgia',19)).pack(anchor='w',pady=10)
+   campos={}
+   for key,label,value in [('url','Endereço HTTPS público — deve corresponder ao CNAME',config['url_publica']),('api','Endereço HTTPS do serviço de comentários — Worker',c['api_url']),('sitekey','Chave pública do Cloudflare Turnstile',c['turnstile_site_key'])]:
+    ttk.Label(painel.body,text=label).pack(anchor='w');w=ttk.Entry(painel.body);w.insert(0,value);w.pack(fill='x',pady=5);campos[key]=w
+   ativo=tk.BooleanVar(value=c['ativado']);obras=tk.BooleanVar(value=c['obras']);capitulos=tk.BooleanVar(value=c['capitulos'])
+   for label,var in [('Ativar comentários próprios',ativo),('Comentários nas páginas das obras, por padrão',obras),('Comentários nos capítulos, por padrão',capitulos)]:ttk.Checkbutton(painel.body,text=label,variable=var).pack(anchor='w',pady=5)
+   ttk.Label(painel.body,text='Os visitantes enviam nome e texto, sem conta externa. Cada mensagem depende de aprovação. Obras e capítulos podem herdar, ativar ou desativar comentários na ficha. A prévia local e a edição offline não enviam comentários reais.',wraplength=650).pack(anchor='w',pady=12)
+   ttk.Label(painel.body,text='Aqui entram apenas endereços e chave pública. A credencial de moderação, a chave secreta do Turnstile e o segredo de proteção de IP ficam no serviço Cloudflare; nunca os coloque nestes campos. Depois de salvar, gere e publique o site e sincronize as discussões na moderação.',wraplength=650).pack(anchor='w',pady=10)
+   estado=tk.StringVar();ttk.Label(painel.body,textvariable=estado,wraplength=650).pack(anchor='w',pady=10)
    try:
     publicas=preparar(self.projeto.root);estado.set(f'Fontes válidas: {len(self.projeto.obras())} obra(s) cadastrada(s), {len(publicas)} pública(s). '+('O catálogo público está vazio.' if not publicas else ''))
    except Exception as e:estado.set('Pendências nas fontes: '+str(e))
    def salvar():
     try:
-     novo=validar({'schema_version':1,'url_publica':url.get().strip(),'disqus':{'ativado':ativo.get(),'shortname':short.get().strip(),'obras':obras.get(),'capitulos':capitulos.get()}},(self.projeto.root/'CNAME').read_text().strip())
-     self.projeto.salvar('configuracao-site.json',novo,rev);painel.close();self.anotar('Configuração do site salva. Gere o site para publicar as alterações de comentários.')
+     novo=validar({'schema_version':2,'url_publica':campos['url'].get().strip(),'comentarios':{'ativado':ativo.get(),'api_url':campos['api'].get().strip(),'turnstile_site_key':campos['sitekey'].get().strip(),'obras':obras.get(),'capitulos':capitulos.get()}},(self.projeto.root/'CNAME').read_text().strip())
+     self.projeto.salvar('configuracao-site.json',novo,rev);painel.close();self.anotar('Configuração salva. Gere e publique o site e sincronize as discussões para ativar os comentários.')
     except Exception as e:painel.set_error(str(e))
-   ttk.Button(painel.footer,text='Salvar configuração com backup',command=salvar).pack(pady=10)
+   ttk.Button(painel.footer,text='Salvar configuração com backup',command=salvar).pack(side='left',padx=5,pady=10)
+   def moderar():painel.close();self.moderar_comentarios()
+   ttk.Button(painel.footer,text='Abrir moderação…',command=moderar).pack(side='left',padx=5,pady=10)
   except Exception as e:messagebox.showerror('Site e comentários',str(e),parent=self)

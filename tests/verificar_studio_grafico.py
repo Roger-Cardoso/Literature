@@ -11,7 +11,7 @@ from gestao_projeto import Projeto
 root=Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as tmp:
  destino=Path(tmp)/'projeto'
- shutil.copytree(root,destino,ignore=shutil.ignore_patterns('.git','.agents','.aws','.codex','__pycache__','.literature-backups','.unilit-build-*'))
+ shutil.copytree(root,destino,ignore=shutil.ignore_patterns('node_modules','.wrangler','.literature-lixeira','.git','.agents','.aws','.codex','__pycache__','.literature-backups','.unilit-build-*'))
  from fixture_projeto import preparar_fixture;preparar_fixture(destino)
  gv.ROOT=integ.ROOT=destino
  gv.Projeto=integ.Projeto=lambda:Projeto(destino)

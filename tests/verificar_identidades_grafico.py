@@ -9,7 +9,7 @@ from gestao_projeto import Projeto
 from editor_componente import modulo
 root=Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as tmp:
- destino=Path(tmp)/'projeto';shutil.copytree(root,destino,ignore=shutil.ignore_patterns('.git','.aws','.codex','.agents','__pycache__','.literature-backups'))
+ destino=Path(tmp)/'projeto';shutil.copytree(root,destino,ignore=shutil.ignore_patterns('node_modules','.wrangler','.literature-lixeira','.git','.aws','.codex','.agents','__pycache__','.literature-backups'))
  from fixture_projeto import preparar_fixture;preparar_fixture(destino)
  gv.ROOT=integ.ROOT=destino;gv.Projeto=integ.Projeto=lambda:Projeto(destino);p=Projeto(destino)
  app=gv.Studio();app.update()

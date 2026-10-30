@@ -14,7 +14,7 @@ from hierarquia import ordenados, validar as validar_hierarquia
 from estado_publicacao import assinatura_fontes
 from exportar_offline import exportar
 from personagens import validar_participacoes
-from configuracao_site import carregar as carregar_configuracao,validar_opcao
+from configuracao_site import carregar as carregar_configuracao,validar_opcao,manifesto_comentarios
 from contrato_semantico import validar_referencias
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -178,9 +178,10 @@ def gerar(root=ROOT, destino=None):
         for nome in ('home','css-global','js-global'):
             shutil.copytree(root/nome,out/nome)
         if (root/'assets').is_dir(): shutil.copytree(root/'assets',out/'assets')
-        for nome in ('index.html','index-app.html','404.html','CNAME','.nojekyll'):
+        for nome in ('index.html','index-app.html','404.html','privacidade.html','CNAME','.nojekyll'):
             shutil.copy2(root/nome,out/nome)
         gravar(out/'configuracao-site.json',config)
+        gravar(out/'comentarios-manifesto.json',manifesto_comentarios(config,resultados))
         catalogo=[];busca=[]
         for pasta,info,estrutura,arquivos in resultados:
             for pagina in ('index-obra.html','leitor.html'):

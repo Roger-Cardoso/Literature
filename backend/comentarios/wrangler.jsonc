@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "literature-comments",
+  "main": "src/worker.mjs",
+  "compatibility_date": "2026-10-30",
+  "workers_dev": true,
+  "vars": {
+    "SITE_ORIGIN": "https://literatura.roger.cardoso.nom.br"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "literature-comments",
+      "database_id": "0f0a49b3-b823-43de-a469-8d9c4283d394",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "0 3 * * *"
+    ]
+  },
+  "observability": {
+    "enabled": false
+  }
+}

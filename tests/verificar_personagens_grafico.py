@@ -12,7 +12,7 @@ from gerar_site import preparar
 
 root=Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as tmp:
- destino=Path(tmp)/'projeto';shutil.copytree(root,destino,ignore=shutil.ignore_patterns('.git','.codex','.aws','.agents','__pycache__','.literature-backups'))
+ destino=Path(tmp)/'projeto';shutil.copytree(root,destino,ignore=shutil.ignore_patterns('node_modules','.wrangler','.literature-lixeira','.git','.codex','.aws','.agents','__pycache__','.literature-backups'))
  from fixture_projeto import preparar_fixture;preparar_fixture(destino)
  gv.ROOT=integ.ROOT=destino;gv.Projeto=integ.Projeto=lambda:Projeto(destino);p=Projeto(destino)
  info,rev=p.ler('obra-1/dados/info-obra.json');canon=info['personagens'][0]['id'];outro=info['personagens'][1]['id'];info['personagens'][0]['aliases']=['Apelido único'];info['personagens'][1]['nome']=info['personagens'][0]['nome'];p.salvar('obra-1/dados/info-obra.json',info,rev)

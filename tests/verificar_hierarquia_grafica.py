@@ -15,7 +15,7 @@ from gerar_site import gerar,preparar
 
 root=Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as tmp:
- destino=Path(tmp)/'projeto';shutil.copytree(root,destino,ignore=shutil.ignore_patterns('.git','.aws','.agents','.codex','site','__pycache__','.literature-backups'))
+ destino=Path(tmp)/'projeto';shutil.copytree(root,destino,ignore=shutil.ignore_patterns('node_modules','.wrangler','.literature-lixeira','.git','.aws','.agents','.codex','site','__pycache__','.literature-backups'))
  from fixture_projeto import preparar_fixture;preparar_fixture(destino)
  p=Projeto(destino);doc=estrutura(1000);h.lista_destino(doc,'capitulo','arco-a').reverse()
  info,rev=p.ler('obra-1/dados/info-obra.json');info['personagens']=[];info['lore']=[];p.salvar('obra-1/dados/info-obra.json',info,rev)

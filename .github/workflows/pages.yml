@@ -22,6 +22,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m unittest discover -s tests -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node backend/comentarios/tests/worker.test.mjs
       - run: node tests/test_interface.cjs
       - run: node tests/test_leitor.cjs
       - run: node tests/test_obra.cjs

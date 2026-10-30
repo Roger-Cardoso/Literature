@@ -12,7 +12,7 @@ spec=importlib.util.spec_from_file_location('gestao',ROOT/'scripts/gestao_projet
 from fixture_projeto import preparar_fixture
 class GestaoTest(unittest.TestCase):
  def setUp(self):
-  self.tmp=tempfile.TemporaryDirectory();self.root=Path(self.tmp.name)/'projeto';shutil.copytree(ROOT,self.root,ignore=shutil.ignore_patterns('site','.git','.agents','.aws','.codex','__pycache__','.literature-backups'))
+  self.tmp=tempfile.TemporaryDirectory();self.root=Path(self.tmp.name)/'projeto';shutil.copytree(ROOT,self.root,ignore=shutil.ignore_patterns('node_modules','.wrangler','.literature-lixeira','site','.git','.agents','.aws','.codex','__pycache__','.literature-backups'))
   preparar_fixture(self.root)
   self.p=m.Projeto(self.root)
  def tearDown(self):self.tmp.cleanup()

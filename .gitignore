@@ -8,3 +8,14 @@ site/
 .edicao-*
 
 .literature-lixeira/
+
+# Ferramentas locais e credenciais do serviço de comentários
+node_modules/
+.wrangler/
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+
+exports/
+!backend/comentarios/.dev.vars.example

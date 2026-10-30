@@ -16,7 +16,7 @@ O comando pode ser chamado de qualquer pasta usando o caminho absoluto do script
 4. Selecione uma cena para revisar relevância, avisos, tratamento, consequência de pular e resumo. A relevância e a avaliação de sensibilidade permanecem decisões suas.
 5. Clique **Salvar** ou use Ctrl+S, depois **Validar**. Os problemas aparecem na janela; salvar não equivale a aprovar a publicação.
 6. Clique **Gerar site** e depois **Prévia**. A prévia abre a área de leitura interna; o botão de navegador inicia uma porta local livre e serve somente `site/`. Ela apresenta a última geração, não alterações ainda não geradas.
-7. Use **Pacote de publicação** para gerar novamente e salvar um ZIP somente dos arquivos públicos. Envio ao GitHub e alterações de DNS não são realizados.
+7. Use **Pacote de publicação** para gerar novamente e salvar um ZIP somente dos arquivos públicos. Para enviar a versão pública, use **Publicar no GitHub**. A configuração de DNS é feita no provedor do domínio.
 
 ## Obras, capítulos e recursos
 

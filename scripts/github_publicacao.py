@@ -128,7 +128,14 @@ def acompanhar(gh,recibo):
 def sincronizar_comentarios(gh,recibo,arquivo_privado):
  if acompanhar(gh,recibo).get('conclusion')!='success':raise ErroPublicacao('Aguarde a implantação ser aprovada antes de sincronizar comentários.')
  repo,branch=destino(recibo['repositorio'],recibo['branch'])
- if gh.chamar('repos/'+repo+'/git/ref/heads/'+quote(branch,safe=''))['object']['sha']!=recibo['commit']:raise ErroPublicacao('Há uma atualização mais recente no repositório. Confira a publicação atual antes de sincronizar.')
+ atual=gh.chamar('repos/'+repo+'/git/ref/heads/'+quote(branch,safe=''))['object']['sha']
+ if atual!=recibo['commit']:
+  # Atualizações de código/documentação podem conservar exatamente o pacote publicado.
+  if acompanhar(gh,{**recibo,'commit':atual}).get('conclusion')!='success':raise ErroPublicacao('A atualização mais recente ainda não foi aprovada. Aguarde antes de sincronizar.')
+  dado=gh.chamar('repos/'+repo+'/contents/'+PREFIXO+MARCADOR+'?ref='+atual)
+  try:meta=json.loads(base64.b64decode(dado['content']))
+  except (KeyError,ValueError):raise ErroPublicacao('Não foi possível conferir a publicação atual.') from None
+  if meta.get('conteudo_sha256')!=recibo.get('conteudo_sha256'):raise ErroPublicacao('Há uma publicação diferente no repositório. Prepare novamente antes de sincronizar.')
  from cliente_comentarios import ClienteComentarios
  c=recibo['config_comentarios']
  if not c.get('api_url'):return {'total':0,'desativado':True}

@@ -94,6 +94,27 @@ class PublicacaoTest(unittest.TestCase):
   with self.assertRaises(ErroPublicacao):self.pacote_e_revisao()
  def test_recibo_e_consulta_correspondem_ao_commit_enviado(self):
   rev=self.pacote_e_revisao();r=enviar(self.pacote,rev,self.gh,'Atualizar');salvar_recibo(self.root,r);self.assertEqual(ultimo_recibo(self.root)['commit'],r['commit']);self.gh.runs=[{'id':1,'head_sha':r['commit'],'status':'completed','conclusion':'success','html_url':'https://github.com/execucao'}];self.assertEqual(acompanhar(self.gh,r)['conclusion'],'success')
+ def test_sincronizacao_recusa_implantacao_pendente(self):
+  with self.assertRaises(ErroPublicacao):sincronizar_comentarios(self.gh,{'repositorio':'Roger-Cardoso/Literature','branch':'main','commit':'head-0'},Path('nao-ler-credencial'))
+ def test_nova_publicacao_nao_recebe_manifesto_antigo(self):
+  rev=self.pacote_e_revisao();recibo=enviar(self.pacote,rev,self.gh,'Publicar');anterior=recibo['commit'];self.gh.head='novo'
+  self.gh.runs=[{'id':1,'head_sha':anterior,'status':'completed','conclusion':'success','html_url':'https://github.com/a'},{'id':2,'head_sha':'novo','status':'completed','conclusion':'success','html_url':'https://github.com/b'}]
+  original=self.gh.chamar
+  def responder(path,*args):
+   if '/contents/publicado/' in path:return {'content':base64.b64encode(json.dumps({'conteudo_sha256':'diferente'}).encode()).decode()}
+   return original(path,*args)
+  self.gh.chamar=responder
+  with self.assertRaises(ErroPublicacao):sincronizar_comentarios(self.gh,recibo,Path('nao-ler-credencial'))
+ def test_atualizacao_de_codigo_com_mesmo_pacote_permite_sincronizar(self):
+  rev=self.pacote_e_revisao();recibo=enviar(self.pacote,rev,self.gh,'Publicar');anterior=recibo['commit'];self.gh.head='novo'
+  self.gh.runs=[{'id':1,'head_sha':anterior,'status':'completed','conclusion':'success','html_url':'https://github.com/a'},{'id':2,'head_sha':'novo','status':'completed','conclusion':'success','html_url':'https://github.com/b'}]
+  original=self.gh.chamar
+  def responder(path,*args):
+   if '/contents/publicado/' in path:return {'content':base64.b64encode(json.dumps({'conteudo_sha256':recibo['conteudo_sha256']}).encode()).decode()}
+   return original(path,*args)
+  self.gh.chamar=responder;cred=Path(self.tmp.name)/'privado.json';cred.write_text(json.dumps({'api_url':recibo['config_comentarios']['api_url'],'admin_token':'x'*40}))
+  with patch('cliente_comentarios.ClienteComentarios') as cls:
+   cls.return_value.sincronizar.return_value={'total':4};self.assertEqual(sincronizar_comentarios(self.gh,recibo,cred)['total'],4)
  def test_destinos_invalidos_e_injecao_de_argumentos(self):
   self.assertEqual(destino('https://github.com/Roger-Cardoso/Literature.git','main'),('Roger-Cardoso/Literature','main'))
   for repo,branch in [('--hostname/evil','main'),('owner/repo','../main'),('owner/repo','a//b'),('owner/repo','a.lock')]:

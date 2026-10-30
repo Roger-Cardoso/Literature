@@ -86,7 +86,7 @@ A demo foi conferida no navegador em tela ampla e em largura próxima de 390 px.
 
 ## Gerenciamento visual — Literature Studio
 
-Execute `python3 gerenciador.py` na raiz. A janela permite editar metadados, texto HTML, cenas, notas, personagens, verbetes e capas; criar obras/capítulos rascunhos; validar e gerar; abrir prévia local e preparar um ZIP público. Backups e detecção de edição concorrente protegem os arquivos de origem. Não realiza envios ao GitHub.
+Execute `python3 gerenciador.py` na raiz. A janela permite editar metadados, texto HTML, cenas, notas, personagens, verbetes e capas; criar obras/capítulos rascunhos; validar e gerar; abrir prévia local e preparar um ZIP público. Backups e detecção de edição concorrente protegem os arquivos de origem. O envio ao GitHub é feito por **Publicar no GitHub**, após preparar e revisar os arquivos públicos.
 
 Roteiro e limites em [docs/gerenciador-visual.md](docs/gerenciador-visual.md).
 

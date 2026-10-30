@@ -37,7 +37,7 @@ O envio suporta arquivos de até 50 MB e até 150 MB de dados alterados por publ
 
 A opção **Sincronizar comentários após implantação aprovada** usa a credencial privada já preparada em `~/.config/literature/comments-admin.json`. Ela não é enviada ao GitHub.
 
-A sincronização utiliza o manifesto exato da versão enviada, depois de os testes e a implantação serem aprovados. Se a branch já tiver outra atualização, a sincronização antiga é recusada. Uma falha na sincronização não desfaz o site implantado; o resultado aparece na aba e pode ser retomado por **Sincronizar comentários agora** ou pela moderação.
+A sincronização utiliza o manifesto exato da versão enviada, depois de os testes e a implantação serem aprovados. Se a branch tiver uma publicação diferente, a sincronização antiga é recusada. Atualizações de código ou documentação que conservem exatamente o mesmo pacote são aceitas somente depois de sua implantação ser aprovada. Uma falha na sincronização não desfaz o site implantado; o resultado aparece na aba e pode ser retomado por **Sincronizar comentários agora** ou pela moderação.
 
 Se não houver credencial local correspondente ao serviço, use a moderação para carregá-la. Um manifesto vazio fecha as discussões antigas sem apagar seus comentários. Desativar comentários com o endereço do serviço ainda configurado também permite sincronizar o manifesto vazio.
 

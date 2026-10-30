@@ -1,10 +1,10 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 import {createWorker} from '../src/worker.mjs';
 class D1 {
- constructor(){this.sql=new DatabaseSync(':memory:');this.sql.exec(readFileSync(new URL('../migrations/0001_comments.sql',import.meta.url),'utf8'));}
+ constructor(){this.sql=new DatabaseSync(':memory:');for(const file of readdirSync(new URL('../migrations/',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())this.sql.exec(readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8'));}
  prepare(sql){const db=this;return {values:[],bind(...values){this.values=values;return this;},async first(){return db.sql.prepare(sql).get(...this.values)||null;},async all(){return {results:db.sql.prepare(sql).all(...this.values)};},async run(){const r=db.sql.prepare(sql).run(...this.values);return {meta:{changes:r.changes}};}};}
  async batch(statements){this.sql.exec('BEGIN');try{const r=[];for(const s of statements)r.push(await s.run());this.sql.exec('COMMIT');return r;}catch(e){this.sql.exec('ROLLBACK');throw e;}}
 }
@@ -89,4 +89,23 @@ test('limpeza remove limites expirados e preserva geração ativa e comentários
 
 test('serviço público recusa HTTP sem TLS',async()=>{
  const f=await fixture();const r=await f.worker.fetch(new Request('http://comments.example/v1/health'),f.env);assert.equal(r.status,400);
+});
+
+test('spoilers, herança de respostas e classificação sem alterar estado',async()=>{
+ const f=await fixture();const requestId=crypto.randomUUID();await f.submit({spoiler:true,request_id:requestId});const root=(await f.all()).items[0];
+ await f.call('/v1/admin/comments/'+root.id,'PATCH',{status:'approved'},true);await f.submit({parent_id:root.id});const reply=(await f.all()).items[1];await f.call('/v1/admin/comments/'+reply.id,'PATCH',{status:'approved'},true);
+ assert.ok((await f.publicComments()).items.every(i=>i.spoiler===1));assert.equal((await f.publicComments()).total,2);
+ await f.call('/v1/admin/comments/'+root.id,'PATCH',{spoiler:false},true);assert.equal((await f.all()).items[0].status,'approved');assert.equal((await f.submit({spoiler:true,request_id:requestId})).status,202,'Revisão do moderador não muda a identidade do envio');
+ assert.equal((await f.submit({spoiler:false,request_id:requestId})).status,409);assert.equal((await f.submit({spoiler:'false'})).status,400);
+});
+test('busca e discussão filtradas no servidor; busca trata texto literalmente',async()=>{
+ const f=await fixture();await f.submit({author:'Ana',body:'A passagem de 100% foi ótima.'});await f.submit({author:'Bia'});
+ const query='/v1/admin/comments?status=all&q='+encodeURIComponent('100%');assert.equal((await f.call(query,'GET',null,true).then(r=>r.json())).items.length,1);
+ const outro=JSON.stringify(['literature','outra',null]);assert.equal((await f.call('/v1/admin/comments?status=all&thread='+encodeURIComponent(outro),'GET',null,true).then(r=>r.json())).items.length,0);
+});
+test('migração preserva mensagens anteriores com proteção inicialmente desmarcada',()=>{
+ const sql=new DatabaseSync(':memory:');sql.exec(readFileSync(new URL('../migrations/0001_comments.sql',import.meta.url),'utf8'));
+ sql.prepare("INSERT INTO comments(id,request_id,thread_id,author,body,status,created_at,updated_at) VALUES (?,?,?,?,?,'approved',?,?)").run(crypto.randomUUID(),crypto.randomUUID(),thread,'Ana','Mensagem anterior à atualização',1700000000000,1700000000000);
+ const antes=sql.prepare('SELECT * FROM comments').get();sql.exec(readFileSync(new URL('../migrations/0002_spoilers.sql',import.meta.url),'utf8'));const depois=sql.prepare('SELECT * FROM comments').get();
+ for(const key of Object.keys(antes))assert.equal(depois[key],antes[key]);assert.equal(depois.spoiler,0);assert.equal(depois.submitted_spoiler,0);sql.close();
 });

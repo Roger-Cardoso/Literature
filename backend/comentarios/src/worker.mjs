@@ -63,27 +63,31 @@ export function createWorker({verify=verifyTurnstile,now=()=>Date.now()}={}){
       if(path==='/v1/comments'&&request.method==='GET'){
         const thread=threadId(url.searchParams.get('thread'));if(!await known(db,thread))reject(404,'Discussão indisponível.');
         const {after,limit}=page(url);
-        const {results}=await db.prepare(`SELECT c.seq,c.id,c.parent_id,c.author,c.body,c.created_at,p.author AS reply_to FROM comments c LEFT JOIN comments p ON p.id=c.parent_id WHERE c.thread_id=? AND c.status='approved' AND c.seq>? AND (c.parent_id IS NULL OR p.status='approved') ORDER BY c.seq LIMIT ?`).bind(thread,after,limit+1).all();
-        const items=results.slice(0,limit);return finish(json({items,next:results.length>limit?items.at(-1).seq:null}));
+        const {results}=await db.prepare(`SELECT c.seq,c.id,c.parent_id,c.author,c.body,c.created_at,(c.spoiler=1 OR COALESCE(p.spoiler,0)=1) AS spoiler,p.author AS reply_to FROM comments c LEFT JOIN comments p ON p.id=c.parent_id WHERE c.thread_id=? AND c.status='approved' AND c.seq>? AND (c.parent_id IS NULL OR p.status='approved') ORDER BY c.seq LIMIT ?`).bind(thread,after,limit+1).all();
+        const items=results.slice(0,limit);
+        const count=await db.prepare("SELECT COUNT(*) AS total FROM comments c LEFT JOIN comments p ON p.id=c.parent_id WHERE c.thread_id=? AND c.status='approved' AND (c.parent_id IS NULL OR p.status='approved')").bind(thread).first();
+        return finish(json({items,total:count.total,next:results.length>limit?items.at(-1).seq:null}));
       }
       if(path==='/v1/comments'&&request.method==='POST'){
         if(origin!==site.origin)reject(403,'Envie o comentário pela página do Literature.');
         if(!env.ADMIN_TOKEN||env.ADMIN_TOKEN.length<32||!env.IP_HASH_SECRET||env.IP_HASH_SECRET.length<32||!env.TURNSTILE_SECRET_KEY)reject(503,'O envio ainda não está configurado.');
         const data=await body(request),thread=threadId(data.thread),author=text(data.author,2,60,'Nome'),message=text(data.body,3,2000,'Comentário'),requestId=uuid(data.request_id),parent=data.parent_id==null?null:uuid(data.parent_id);
+        if(data.spoiler!==undefined&&typeof data.spoiler!=='boolean')reject(400,'Opção de spoiler inválida.');
+        const submittedSpoiler=data.spoiler===true?1:0;
         if(data.website)reject(400,'Envio recusado.'); // Campo que permanece vazio para visitantes.
         if(!await known(db,thread))reject(404,'Discussão indisponível.');
         const token=text(data.turnstile_token,1,2048,'Verificação'),ip=request.headers.get('CF-Connecting-IP');
         if(!ip)reject(503,'Não foi possível verificar o envio.');
         if(!await verify(token,ip,env))reject(403,'Refaça a verificação antes de enviar.');
-        const existing=await db.prepare('SELECT thread_id,author,body,parent_id FROM comments WHERE request_id=?').bind(requestId).first();
-        if(existing){if(existing.thread_id!==thread||existing.author!==author||existing.body!==message||existing.parent_id!==parent)reject(409,'Esse envio já foi usado. Atualize o formulário.');return finish(json({status:'pending'},202));}
+        const existing=await db.prepare('SELECT thread_id,author,body,parent_id,submitted_spoiler FROM comments WHERE request_id=?').bind(requestId).first();
+        if(existing){if(existing.thread_id!==thread||existing.author!==author||existing.body!==message||existing.parent_id!==parent||existing.submitted_spoiler!==submittedSpoiler)reject(409,'Esse envio já foi usado. Atualize o formulário.');return finish(json({status:'pending'},202));}
         const bucket=Math.floor(time/600000),key=await ipKey(ip,bucket,env.IP_HASH_SECRET);
         const count=await db.prepare('INSERT INTO rate_limits(key,hits,expires_at) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET hits=hits+1 RETURNING hits').bind(key,(bucket+2)*600000).first();
         if(count.hits>5)reject(429,'Muitos envios. Aguarde alguns minutos antes de tentar novamente.');
         if(parent&&!await db.prepare("SELECT id FROM comments WHERE id=? AND thread_id=? AND status='approved' AND parent_id IS NULL").bind(parent,thread).first())reject(400,'O comentário original não está disponível para resposta.');
         const id=crypto.randomUUID();
-        const result=await db.prepare(`INSERT OR IGNORE INTO comments(id,request_id,thread_id,parent_id,author,body,status,created_at,updated_at) SELECT ?,?,?,?,?,?,'pending',?,? WHERE EXISTS(SELECT 1 FROM threads WHERE generation=${ACTIVE} AND id=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM comments WHERE id=? AND status='approved' AND thread_id=? AND parent_id IS NULL))`).bind(id,requestId,thread,parent,author,message,time,time,thread,parent,parent,thread).run();
-        if(!result.meta.changes){const retry=await db.prepare('SELECT thread_id,author,body,parent_id FROM comments WHERE request_id=?').bind(requestId).first();if(!retry||retry.thread_id!==thread||retry.author!==author||retry.body!==message||retry.parent_id!==parent)reject(409,'A discussão mudou. Atualize antes de enviar.');}
+        const result=await db.prepare(`INSERT OR IGNORE INTO comments(id,request_id,thread_id,parent_id,author,body,status,created_at,updated_at,spoiler,submitted_spoiler) SELECT ?,?,?,?,?,?,'pending',?,?,MAX(?,COALESCE((SELECT spoiler FROM comments WHERE id=?),0)),? WHERE EXISTS(SELECT 1 FROM threads WHERE generation=${ACTIVE} AND id=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM comments WHERE id=? AND status='approved' AND thread_id=? AND parent_id IS NULL))`).bind(id,requestId,thread,parent,author,message,time,time,submittedSpoiler,parent,submittedSpoiler,thread,parent,parent,thread).run();
+        if(!result.meta.changes){const retry=await db.prepare('SELECT thread_id,author,body,parent_id,submitted_spoiler FROM comments WHERE request_id=?').bind(requestId).first();if(!retry||retry.thread_id!==thread||retry.author!==author||retry.body!==message||retry.parent_id!==parent||retry.submitted_spoiler!==submittedSpoiler)reject(409,'A discussão mudou. Atualize antes de enviar.');}
         return finish(json({status:'pending'},202));
       }
       if(path==='/v1/admin/threads'&&request.method==='POST'){
@@ -104,13 +108,18 @@ export function createWorker({verify=verifyTurnstile,now=()=>Date.now()}={}){
       }
       if(path==='/v1/admin/comments'&&request.method==='GET'){
         const {after,limit}=page(url),status=url.searchParams.get('status')||'pending';if(!['pending','approved','hidden','all'].includes(status))reject(400,'Filtro inválido.');
-        const {results}=await db.prepare(`SELECT c.*,t.title,t.url FROM comments c LEFT JOIN threads t ON t.generation=${ACTIVE} AND t.id=c.thread_id WHERE c.seq>? AND (?='all' OR c.status=?) ORDER BY c.seq LIMIT ?`).bind(after,status,status,limit+1).all();
+        const query=url.searchParams.get('q')||'',filter=url.searchParams.get('thread')||'';
+        if(query.length>100)reject(400,'Busca muito longa.');if(filter)threadId(filter);
+        const {results}=await db.prepare(`SELECT c.*,t.title,t.url,p.spoiler AS parent_spoiler FROM comments c LEFT JOIN threads t ON t.generation=${ACTIVE} AND t.id=c.thread_id LEFT JOIN comments p ON p.id=c.parent_id WHERE c.seq>? AND (?='all' OR c.status=?) AND (?='' OR c.thread_id=?) AND (?='' OR instr(lower(c.author||' '||c.body),lower(?))>0) ORDER BY c.seq LIMIT ?`).bind(after,status,status,filter,filter,query,query,limit+1).all();
         const items=results.slice(0,limit);return finish(json({items,next:results.length>limit?items.at(-1).seq:null}));
       }
       const match=path.match(/^\/v1\/admin\/comments\/([0-9a-f-]+)$/);
       if(match&&request.method==='PATCH'){
-        const id=uuid(match[1]),data=await body(request);if(!['approved','hidden','pending'].includes(data.status))reject(400,'Estado inválido.');
-        const result=await db.prepare('UPDATE comments SET status=?,updated_at=? WHERE id=?').bind(data.status,time,id).run();if(!result.meta.changes)reject(404,'Comentário não encontrado.');return finish(json({ok:true}));
+        const id=uuid(match[1]),data=await body(request);
+        if(data.status===undefined&&data.spoiler===undefined)reject(400,'Informe a alteração.');
+        if(data.status!==undefined&&!['approved','hidden','pending'].includes(data.status))reject(400,'Estado inválido.');
+        if(data.spoiler!==undefined&&typeof data.spoiler!=='boolean')reject(400,'Opção de spoiler inválida.');
+        const result=await db.prepare('UPDATE comments SET status=COALESCE(?,status),spoiler=COALESCE(?,spoiler),updated_at=? WHERE id=?').bind(data.status??null,data.spoiler===undefined?null:Number(data.spoiler),time,id).run();if(!result.meta.changes)reject(404,'Comentário não encontrado.');return finish(json({ok:true}));
       }
       if(match&&request.method==='DELETE'){
         const result=await db.prepare('DELETE FROM comments WHERE id=?').bind(uuid(match[1])).run();if(!result.meta.changes)reject(404,'Comentário não encontrado.');return finish(json({ok:true}));

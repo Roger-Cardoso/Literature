@@ -80,3 +80,9 @@ Não é uma promessa de armazenamento ilimitado ou bloqueio absoluto de spam. Ac
 - Na raiz: `python3 -m unittest discover -s tests -q`, `node tests/test_comentarios.cjs`, `python3 tests/verificar_comentarios_grafico.py` e `python3 tests/verificar_moderacao_grafico.py`.
 
 O arquivo `.dev.vars` e a pasta `.wrangler` são locais e ignorados pelo Git. Não exponha o endpoint administrativo no frontend; ele é usado pelo Studio com credencial de sessão.
+
+### Atualização para spoilers e busca
+
+Antes de implantar esta versão do Worker, aplique as migrações pendentes com `npx wrangler d1 migrations apply literature-comments --remote`, nesta pasta. A migração `0002_spoilers.sql` acrescenta campos às mensagens existentes sem apagá-las. Em seguida, use `npx wrangler deploy`. Só publique a interface atualizada após concluir essa atualização do serviço.
+
+A escolha original de spoiler é preservada separadamente da classificação moderada para que uma nova tentativa do mesmo envio continue idempotente após a revisão. A consulta pública também protege respostas quando o comentário original está sinalizado. A busca administrativa aceita texto literal com até 100 caracteres e um identificador exato de discussão; ambos são parâmetros SQL. Não há alteração dos nomes ou textos dos comentários existentes.

@@ -26,3 +26,12 @@ class ClienteComentariosTest(unittest.TestCase):
   c=ClienteComentarios('https://comments.example','s'*40);c.listar=Mock(side_effect=[{'items':[{'body':'Pendente'}],'next':2},{'items':[{'body':'Oculto'}],'next':None}]);copia=c.exportar();self.assertEqual(len(copia['comentarios']),2);self.assertNotIn('s'*40,json.dumps(copia))
  def test_manifesto_vazio_fecha_discussao_sem_apagar_comentarios(self):
   c=ClienteComentarios('https://comments.example','s'*40);c.chamar=Mock(return_value={});c.sincronizar({'schema_version':1,'threads':[]});self.assertEqual(len(c.chamar.call_args_list),2);self.assertEqual(c.chamar.call_args_list[0].args[2]['threads'],[])
+
+ def test_busca_e_classificacao_de_spoiler(self):
+  from urllib.parse import urlsplit,parse_qs
+  c=ClienteComentarios('https://comments.example','s'*40);c.chamar=Mock(return_value={})
+  c.listar('all',50,busca='100% Ana',discussao='["literature","obra",null]');q=parse_qs(urlsplit(c.chamar.call_args.args[0]).query)
+  self.assertEqual(q['q'],['100% Ana']);self.assertEqual(q['after'],['50']);self.assertEqual(q['thread'],['["literature","obra",null]'])
+  ident='9d272cf6-5273-4b98-8ea4-5456bbb93c85';c.classificar_spoiler(ident,True);self.assertEqual(c.chamar.call_args.args[2],{'spoiler':True})
+  with self.assertRaises(ValueError):c.listar(busca='a'*101)
+  with self.assertRaises(ValueError):c.classificar_spoiler(ident,'false')

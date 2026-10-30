@@ -24,8 +24,13 @@ class ClienteComentarios:
   except error.URLError:raise ValueError('Não foi possível conectar ao serviço de comentários.') from None
   if len(conteudo)>2_000_000:raise ValueError('Resposta muito grande. Use uma página menor.')
   return json.loads(conteudo)
- def listar(self,estado='pending',depois=0):
-  return self.chamar('/v1/admin/comments?'+parse.urlencode({'status':estado,'after':depois,'limit':50}))
+ def listar(self,estado='pending',depois=0,*,busca='',discussao=''):
+  if len(busca)>100:raise ValueError('Use até 100 caracteres na busca.')
+  return self.chamar('/v1/admin/comments?'+parse.urlencode({'status':estado,'after':depois,'limit':50,'q':busca,'thread':discussao}))
+ def classificar_spoiler(self,ident,spoiler):
+  uuid.UUID(ident)
+  if not isinstance(spoiler,bool):raise ValueError('Classificação inválida.')
+  return self.chamar('/v1/admin/comments/'+ident,'PATCH',{'spoiler':spoiler})
  def alterar(self,ident,estado):
   uuid.UUID(ident)
   return self.chamar('/v1/admin/comments/'+ident,'PATCH',{'status':estado})

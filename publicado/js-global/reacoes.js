@@ -18,7 +18,7 @@
   if(!destino)return;const vez=++sequencia;destino.replaceChildren();destino.hidden=true;
   if(widget!==null&&global.turnstile){try{global.turnstile.remove(widget);}catch{}widget=null;}
   try{
-   const r=await fetch('../configuracao-site.json');if(!r.ok)return;const config=await r.json();if(vez!==sequencia||!permitido(config,obra,capitulo))return;
+   const r=await fetch('../configuracao-site.json',{cache:'no-store'});if(!r.ok)return;const config=await r.json();if(vez!==sequencia||!permitido(config,obra,capitulo))return;
    const base=new URL(config.comentarios.api_url);if(base.protocol!=='https:'||base.username||base.password||base.port||base.search||base.hash||!['','/'].includes(base.pathname))throw Error();
    const {identifier:thread}=global.ComentariosLiterature.identidade(config,obra,capitulo);
    destino.hidden=false;destino.classList.add('reacoes-literature');destino.append(criar('h2',capitulo?'O que achou deste capítulo?':'O que achou desta obra?'));

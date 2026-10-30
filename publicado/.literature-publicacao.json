@@ -16,7 +16,7 @@
     "css-global/guia-cenas.css": "7fbd008ed504affdf38f791ceea2c8ad5e1d0e1c3087a5d2fb22749c4c71768b",
     "css-global/leitor.css": "c5ef888dd359dd0531ca8c82322f7296fb8f7270b42f0cf391db65f4857fe680",
     "css-global/obra.css": "0c7d9085b734071d8f8ba8fcf79a860428ee539ecc3faca3a8bd0d90553615b4",
-    "geracao.json": "f3994519bfd9878dc2726c2dfb9406c6eea9c2965d851e6f8bb9614cbcd1c74f",
+    "geracao.json": "2140db8d69145daf6237347398d9cbe7bb613b14861b73547dfa075b20b0fdfb",
     "home/demo-contexto.html": "821b0e17df0daf2a121ec46f5cdce8e0fcacc581da1c4b8d6c5cae95b6313353",
     "home/demo-especializada.html": "8fc16acc4932d4b2d8e4b88e1dccdee0b9971eee53821485cacbdd65b8211b15",
     "home/demo-guia-cenas.html": "655376776b9982d426812a043f665462ee88946e15da1bed911b931e19ff9fff",
@@ -30,7 +30,7 @@
     "js-global/metadados.js": "89e1a16b3a8892ce8a5d179f271273ef752c6b021ae67c8c87129b26add34d01",
     "js-global/semantica.js": "b4cfda9e61243c7a172d92bad4d53564a52b2eba6dd895d68cb9f34aafd8a597",
     "obra-1/dados/estrutura.json": "ee0a3f12797a9cbeea3270e1c32662d67a8faf451a97cba03d65221d856af9cb",
-    "obra-1/dados/info-obra.json": "f56b1844862eacf864af83fa4497dc44f4377691ffd658da9c416f0dd6c1fa0b",
+    "obra-1/dados/info-obra.json": "8e2971099032c439ff9b01407c755c8d4b81c7c8e631730bafc24777542209fd",
     "obra-1/index-obra.html": "90836db0f386a17db39ba300f7d2db63aec4e9b2368f44fb4d310cbebb13aa51",
     "obra-1/leitor.html": "91a1e8bbd6509da5d51d5bf4dc95391ffe0276931f57ba8a45daacf4fdebbf1d",
     "obra-1/offline.html": "6fd017e395b510eb36c9746ae77a4ee103aefbfb69e5b044a6531b440a60e0ca",
@@ -39,5 +39,5 @@
     "obra-1/writed/saga-1/volume-1/arco-1/capitulo-02.html": "ce30c32414ea25ce0dfdac3ea6966fa80be9a9d8c84122d43bc514845f50072d",
     "privacidade.html": "7e9753a48ee0319122c6403c20607fda317a9f37904b7f513e25dd414113016a"
   },
-  "conteudo_sha256": "c4ab947ffe72d8486de7cd4854db89ca697691655829ac153e941f51cb9afef5"
+  "conteudo_sha256": "931bcb191fd3faa0de860ae44bf7aceb9371c2897574d5dec2907a58754a2d42"
 }

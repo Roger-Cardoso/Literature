@@ -1,0 +1,95 @@
+{
+  "id_obra": "obra-1",
+  "titulo": "A Lenda do Sertão",
+  "subtitulo": "O Despertar da Terra Seca",
+  "autor": "Roger",
+  "tags": [],
+  "temas": [
+    "Sistema de Magia Rígido",
+    "Folclore",
+    "Sobrevivência"
+  ],
+  "sinopse": "Quando o sol se recusa a se pôr...",
+  "lore": [
+    {
+      "titulo": "Enciclopédia & Wiki",
+      "descricao": "Glossário de termos geográficos, bestiário e itens lendários.",
+      "id": "obra-1-verbete-001",
+      "categoria": "universo"
+    },
+    {
+      "titulo": "Sistema de Magia & Escala",
+      "descricao": "Como funcionam as Bênçãos Secas e as classificações místicas.",
+      "id": "obra-1-verbete-002",
+      "categoria": "universo"
+    }
+  ],
+  "personagens": [
+    {
+      "nome": "O Viajante",
+      "imagem": "https://placehold.co/50x50/11151c/66fcf1",
+      "id": "obra-1-personagem-001",
+      "descricao_curta": "Protagonista / Atributo: Vento",
+      "aliases": [],
+      "imagem_alt": "Retrato de O Viajante"
+    },
+    {
+      "nome": "Mestre Forjador",
+      "imagem": "https://placehold.co/50x50/11151c/e67e22",
+      "id": "obra-1-personagem-002",
+      "descricao_curta": "Coadjuvante / Aliado",
+      "aliases": [],
+      "imagem_alt": "Retrato de Mestre Forjador"
+    },
+    {
+      "id": "personagem-01f7fb1f46ba447c94b902d047b576e3",
+      "nome": "Makoto",
+      "aliases": [],
+      "descricao_curta": "",
+      "descricao": "",
+      "imagem": "",
+      "imagem_alt": "",
+      "disponivel_apos_capitulo": null
+    },
+    {
+      "id": "personagem-80131d9741f343208088f9383addd849",
+      "nome": "Tsukuyomi",
+      "aliases": [],
+      "descricao_curta": "",
+      "descricao": "",
+      "imagem": "",
+      "imagem_alt": "",
+      "disponivel_apos_capitulo": null
+    },
+    {
+      "id": "personagem-0d9d8d4c03134d49a1dd58c7906463e4",
+      "nome": "???",
+      "aliases": [],
+      "descricao_curta": "",
+      "descricao": "",
+      "imagem": "",
+      "imagem_alt": "",
+      "disponivel_apos_capitulo": null
+    }
+  ],
+  "schema_version": 2,
+  "slug": "obra-1",
+  "idioma": "pt-BR",
+  "estado_obra": "em_andamento",
+  "estado_publicacao": "publicado",
+  "ordem_catalogo": 1,
+  "generos": [],
+  "avisos_conteudo": [],
+  "formato": "publicacao_seriada",
+  "publico_alvo": "Seinen",
+  "classificacao_indicativa": "16",
+  "capa": {
+    "src": "/assets/imagens/sertao-cover.svg",
+    "alt": "Capa de A Lenda do Sertão"
+  },
+  "comentarios": "herdar",
+  "capa_url": "/assets/imagens/sertao-cover.svg",
+  "status": "Em Lançamento",
+  "total_capitulos": 3,
+  "total_palavras": 2001
+}

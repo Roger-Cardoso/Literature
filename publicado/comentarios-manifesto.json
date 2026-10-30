@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "threads": [
+    {
+      "id": "[\"literature\",\"obra-1\",null]",
+      "title": "A Lenda do Sertão",
+      "url": "https://literatura.roger.cardoso.nom.br/obra-1/index-obra.html"
+    },
+    {
+      "id": "[\"literature\",\"obra-1\",\"obra-1-cap-001\"]",
+      "title": "Capitulo 01 — A Lenda do Sertão",
+      "url": "https://literatura.roger.cardoso.nom.br/obra-1/leitor.html?id=obra-1-cap-001"
+    },
+    {
+      "id": "[\"literature\",\"obra-1\",\"obra-1-cap-002\"]",
+      "title": "Capitulo 02 — A Lenda do Sertão",
+      "url": "https://literatura.roger.cardoso.nom.br/obra-1/leitor.html?id=obra-1-cap-002"
+    },
+    {
+      "id": "[\"literature\",\"obra-1\",\"cap-5c76f32d688743ce9161a2b627808458\"]",
+      "title": "Este é o Começo do Céu de Outono — A Lenda do Sertão",
+      "url": "https://literatura.roger.cardoso.nom.br/obra-1/leitor.html?id=cap-5c76f32d688743ce9161a2b627808458"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "id_obra": "obra-1",
+    "slug": "obra-1",
+    "titulo": "A Lenda do Sertão",
+    "autor": "Roger",
+    "sinopse": "Quando o sol se recusa a se pôr...",
+    "capa_url": "/assets/imagens/sertao-cover.svg",
+    "status": "Em Lançamento",
+    "formato": "publicacao_seriada",
+    "tags": [],
+    "temas": [
+      "Sistema de Magia Rígido",
+      "Folclore",
+      "Sobrevivência"
+    ],
+    "generos": [],
+    "total_capitulos": 3,
+    "total_palavras": 2001,
+    "ordem_catalogo": 1,
+    "ultima_publicacao": "2026-10-29"
+  }
+]

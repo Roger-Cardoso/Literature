@@ -1,0 +1,116 @@
+{
+  "sagas": [
+    {
+      "slug": "saga-1",
+      "nome": "Saga 1",
+      "volumes": [
+        {
+          "slug": "volume-1",
+          "nome": "Volume 1",
+          "arcos": [
+            {
+              "slug": "arco-1",
+              "nome": "Arco 1",
+              "capitulos": [
+                {
+                  "id": "obra-1-cap-001",
+                  "titulo": "Capitulo 01",
+                  "arquivo": "writed/saga-1/volume-1/arco-1/capitulo-01.html",
+                  "id_legado": 1,
+                  "numero": "1",
+                  "ordem": 1,
+                  "estado_publicacao": "publicado",
+                  "publicado_em": "2026-06-13",
+                  "avisos_conteudo": [],
+                  "sinopse": "",
+                  "cenas": [
+                    {
+                      "id": "obra-1-cap-001-cena-01",
+                      "ancora": "obra-1-cap-001-cena-01",
+                      "titulo_cena": "Cena 1",
+                      "visibilidade": "publica",
+                      "relevancia": "nao_avaliada",
+                      "avaliacao_conteudo": "pendente",
+                      "avisos_conteudo": []
+                    },
+                    {
+                      "id": "obra-1-cap-001-cena-02",
+                      "ancora": "obra-1-cap-001-cena-02",
+                      "titulo_cena": "Cena 2",
+                      "visibilidade": "publica",
+                      "relevancia": "nao_avaliada",
+                      "avaliacao_conteudo": "pendente",
+                      "avisos_conteudo": []
+                    },
+                    {
+                      "id": "obra-1-cap-001-cena-03",
+                      "ancora": "obra-1-cap-001-cena-03",
+                      "titulo_cena": "Cena 3",
+                      "visibilidade": "publica",
+                      "relevancia": "nao_avaliada",
+                      "avaliacao_conteudo": "pendente",
+                      "avisos_conteudo": []
+                    }
+                  ],
+                  "palavras": 518,
+                  "data_publicacao": "2026-06-13"
+                },
+                {
+                  "id": "obra-1-cap-002",
+                  "titulo": "Capitulo 02",
+                  "arquivo": "writed/saga-1/volume-1/arco-1/capitulo-02.html",
+                  "id_legado": 2,
+                  "numero": "2",
+                  "ordem": 2,
+                  "estado_publicacao": "publicado",
+                  "publicado_em": "2026-06-13",
+                  "avisos_conteudo": [],
+                  "sinopse": "",
+                  "cenas": [
+                    {
+                      "id": "obra-1-cap-002-trecho-integral",
+                      "ancora": "obra-1-cap-002-trecho-integral",
+                      "titulo_cena": "Capítulo completo · sem divisão em cenas",
+                      "visibilidade": "publica",
+                      "relevancia": "nao_avaliada",
+                      "avaliacao_conteudo": "pendente",
+                      "avisos_conteudo": []
+                    }
+                  ],
+                  "palavras": 435,
+                  "data_publicacao": "2026-06-13"
+                },
+                {
+                  "id": "cap-5c76f32d688743ce9161a2b627808458",
+                  "titulo": "Este é o Começo do Céu de Outono",
+                  "numero": "3",
+                  "ordem": 3,
+                  "arquivo": "writed/cap-5c76f32d688743ce9161a2b627808458.html",
+                  "estado_publicacao": "publicado",
+                  "publicado_em": "2026-10-29",
+                  "sinopse": "",
+                  "avisos_conteudo": [],
+                  "cenas": [],
+                  "atualizado_em": null,
+                  "verbetes_ids": [],
+                  "personagens_ids": [],
+                  "palavras": 1048,
+                  "data_publicacao": "2026-10-29"
+                }
+              ],
+              "id": "obra-1-saga-001-volume-001-arco-001",
+              "ordem": 1
+            }
+          ],
+          "id": "obra-1-saga-001-volume-001",
+          "ordem": 1
+        }
+      ],
+      "id": "obra-1-saga-001",
+      "ordem": 1
+    }
+  ],
+  "schema_version": 2,
+  "total_capitulos": 3,
+  "total_palavras": 2001
+}

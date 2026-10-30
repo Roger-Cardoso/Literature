@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Literature — Histórias para habitar</title>
+    <meta name="description" content="Explore as obras e os universos literários de Roger Cardoso.">
+    <link rel="canonical" href="https://literatura.roger.cardoso.nom.br/home/">
+    <link rel="stylesheet" href="../css-global/global.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/imagens/literature-mark.svg">
+    <meta name="theme-color" content="#0c1216">
+</head>
+<body class="page-home">
+    <a class="skip-link" href="#biblioteca">Ir para a biblioteca</a>
+
+    <nav class="navbar" aria-label="Navegação principal">
+        <a href="../home/" class="logo" aria-label="Literature — início">Literature<span>.</span></a>
+        <div class="nav-links"><a href="#biblioteca" class="active">Biblioteca</a><span class="nav-note">Um universo de histórias</span></div>
+    </nav>
+    <main>
+        <section class="home-hero" aria-labelledby="home-title">
+            <div><span class="eyebrow">O próximo capítulo começa aqui</span><h1 id="home-title">Entre páginas,<br>descubra <em>universos.</em></h1></div>
+            <div class="hero-aside"><p class="hero-description">Um lugar para explorar histórias, conhecer seus personagens e se perder em mundos que continuam além da última página.</p>
+                <div class="library-stats" aria-label="Nesta biblioteca"><div><strong id="stat-obras">—</strong><span>Obras</span></div><div><strong id="stat-capitulos">—</strong><span>Capítulos</span></div><div><strong id="stat-palavras">—</strong><span>Palavras</span></div></div>
+            </div>
+        </section>
+        <section id="biblioteca" aria-labelledby="library-title">
+            <div class="section-heading"><div><h2 id="library-title" class="titulo-secao">Sua próxima leitura</h2><div class="section-caption">Explore a biblioteca. Encontre o seu universo.</div></div>
+                <div class="busca-global"><input type="search" id="input-busca" class="input-busca-global" aria-label="Buscar obras por título, sinopse ou tema" placeholder="Buscar uma história, um tema..." oninput="filtrarObras()"></div>
+            </div>
+            <div id="grid-obras-dinamico" class="grid-obras" aria-live="polite"><div class="loading-text">Abrindo a biblioteca...</div></div>
+        </section>
+    </main>
+    <footer class="site-footer"><span class="footer-brand">Literature.</span><span class="footer-note">Histórias para habitar. Universos para descobrir.</span><span>Por Roger Cardoso</span></footer>
+
+    <script>
+        // Array global para armazenar os dados e permitir a busca em tempo real
+        let catalogoGlobal = [];
+
+        // 1. Função que consome o catalogo.json gerado pelo Python
+        async function carregarCatalogo() {
+            try {
+                // Tenta buscar o arquivo na raiz
+                const resposta = await fetch('../catalogo.json');
+                
+                if (!resposta.ok) {
+                    throw new Error("Arquivo catalogo.json não encontrado. Rode o gerador_universo.py primeiro.");
+                }
+
+                catalogoGlobal = await resposta.json();
+                renderizarObras(catalogoGlobal);
+                document.getElementById('stat-obras').textContent = String(catalogoGlobal.length).padStart(2, '0');
+                document.getElementById('stat-capitulos').textContent = String(catalogoGlobal.reduce((n, o) => n + o.total_capitulos, 0)).padStart(2, '0');
+                document.getElementById('stat-palavras').textContent = catalogoGlobal.reduce((n, o) => n + o.total_palavras, 0).toLocaleString('pt-BR');
+
+            } catch (erro) {
+                console.error("Erro Crítico:", erro);
+                document.getElementById('grid-obras-dinamico').innerHTML = `
+                    <div style="border: 1px solid #e74c3c; padding: 20px; border-radius: 8px; color: #e74c3c;">
+                        <strong>Erro ao carregar o catálogo.</strong><br>
+                        Detalhe: ${erro.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 2. Função que injeta o HTML das obras na tela
+        function renderizarObras(obras) {
+            const container = document.getElementById('grid-obras-dinamico');
+            container.innerHTML = ''; // Limpa o "Buscando obras..."
+
+            if (obras.length === 0) {
+                container.innerHTML = '<div class="loading-text">Nenhuma obra encontrada.</div>';
+                return;
+            }
+
+            obras.forEach(obra => {
+                // Determina a cor da tag de status dinamicamente
+                let classeStatus = 'pausado';
+                const statusLower = obra.status.toLowerCase();
+                if (statusLower.includes('lançamento') || statusLower.includes('andamento')) classeStatus = 'em-andamento';
+                if (statusLower.includes('concluído')) classeStatus = 'concluido';
+
+                // Renderiza as tags do array para HTML
+                const tagsHtml = [obra.formato, ...(obra.generos || []), ...(obra.tags || [])].filter(Boolean).map(tag => `<span>${tag}</span>`).join(' <span class="meta-dot">•</span> ');
+
+                // Constrói o HTML do cartão mesclando com os dados
+                const cartaoHTML = `
+                <article class="cartao-obra">
+                    <div class="linha-principal-obra">
+                        <div class="coluna-capa"><a href="../${obra.slug || obra.id_obra}/index-obra.html" tabindex="-1" aria-hidden="true"><img src="${obra.capa_url}" alt="Capa de ${obra.titulo}" class="capa-miniatura" width="400" height="600"></a><span class="status-lancamento ${classeStatus}">${obra.status}</span></div>
+                        <div class="info-texto-obra"><div class="work-kicker">Literature · Publicação seriada</div><h3 class="nome-obra">${obra.titulo}</h3>
+                            <div class="metadados-limpos"><span>Por <span class="meta-destaque">${obra.autor}</span></span><span class="meta-dot">/</span><span>${(obra.temas || []).join(' · ')}</span></div>
+                            <p class="sinopse-obra">${obra.sinopse}</p><button class="gatilho-ler-mais" aria-expanded="false" onclick="alternarExpansao(this.closest('article'), event)">Ler sinopse completa ↓</button>
+                            <div class="acao-obra"><div class="work-facts"><span><strong>${String(obra.total_capitulos).padStart(2, '0')}</strong> capítulos</span><span><strong>${obra.total_palavras.toLocaleString('pt-BR')}</strong> palavras</span></div><a href="../${obra.slug || obra.id_obra}/index-obra.html" class="botao-primario">Explorar a obra <span aria-hidden="true">↗</span></a></div>
+                        </div>
+                    </div>
+                </article>`;
+
+                // Insere o cartão no final do grid
+                container.insertAdjacentHTML('beforeend', cartaoHTML);
+            });
+        }
+
+        // 3. Sistema de Busca na barra superior
+        function filtrarObras() {
+            const termoBusca = document.getElementById('input-busca').value.toLowerCase();
+            const obrasFiltradas = catalogoGlobal.filter(obra => 
+                [obra.titulo, obra.sinopse, ...(obra.tags || []), ...(obra.temas || []), ...(obra.generos || [])].join(' ').toLowerCase().includes(termoBusca)
+            );
+            renderizarObras(obrasFiltradas);
+        }
+
+        // Funções de UI herdadas
+        function alternarExpansao(cartao, evento) {
+            if (evento.target.tagName.toLowerCase() === 'a') return;
+            cartao.classList.toggle('expandido');
+            const gatilho = cartao.querySelector('.gatilho-ler-mais');
+            gatilho.innerText = cartao.classList.contains('expandido') ? 'Recolher sinopse ↑' : 'Ler sinopse completa ↓';
+            gatilho.setAttribute('aria-expanded', cartao.classList.contains('expandido'));
+        }
+
+        function pararPropagacao(evento) { 
+            evento.stopPropagation(); 
+        }
+
+
+
+        // Inicia tudo quando a janela carrega
+        window.onload = carregarCatalogo;
+    </script>
+</body>
+</html>

@@ -11,19 +11,19 @@
     "catalogo.json": "d21f85fae0d6f8663e5cc1936e4f57b638e4c4688280f4b15c9fee51e4f801ac",
     "comentarios-manifesto.json": "9a38669a119a5b2799925c60e7cea22fb731578bf1875bac5a21c73b6454f796",
     "configuracao-site.json": "2efd853b978b1eeedf2ac93e51cdab3f74e8d358a453c8051f3c5d54b9bc6151",
-    "css-global/comentarios.css": "70609be5c7aa6d29f64f083fb9506fc3d0ebca7935bcdd05b384e7a38efa8ec6",
+    "css-global/comentarios.css": "e07d452a927febd2d2befa627a91885f943937c9704a8752a9a581847b797be9",
     "css-global/global.css": "8507fb827cf783300a28d4bfd71e206eafa08e1be733d62d7a97153cbacd4fbb",
     "css-global/guia-cenas.css": "7fbd008ed504affdf38f791ceea2c8ad5e1d0e1c3087a5d2fb22749c4c71768b",
     "css-global/leitor.css": "c5ef888dd359dd0531ca8c82322f7296fb8f7270b42f0cf391db65f4857fe680",
     "css-global/obra.css": "0c7d9085b734071d8f8ba8fcf79a860428ee539ecc3faca3a8bd0d90553615b4",
-    "geracao.json": "2140db8d69145daf6237347398d9cbe7bb613b14861b73547dfa075b20b0fdfb",
+    "geracao.json": "d2b2b0531531800a06e12933d074c01576bb8f3c6897b31a64f3da99e3119c1c",
     "home/demo-contexto.html": "821b0e17df0daf2a121ec46f5cdce8e0fcacc581da1c4b8d6c5cae95b6313353",
     "home/demo-especializada.html": "8fc16acc4932d4b2d8e4b88e1dccdee0b9971eee53821485cacbdd65b8211b15",
     "home/demo-guia-cenas.html": "655376776b9982d426812a043f665462ee88946e15da1bed911b931e19ff9fff",
     "home/index.html": "0400aea062980fe2e3ad4c5ac82dd1f12aca4e9ae05ecb7f6000a500b6ece99b",
     "index-app.html": "716569d18eeedc75f89a8968f084ebd00276b458e1148dead4ff83c30d53297c",
     "index.html": "716569d18eeedc75f89a8968f084ebd00276b458e1148dead4ff83c30d53297c",
-    "js-global/comentarios.js": "2848eb8e8fe90406034619c84dd009b88da9fbb07f49588531ebde4f007bda19",
+    "js-global/comentarios.js": "d26c20026a70818e8171f670316d78af0eb890eb850ec760be9a12d4a2b10b8f",
     "js-global/contexto.js": "cb7ef60c3c6eca5d8c49f7a7432500f608177e94dc8e6d67a3fc6cb585867a03",
     "js-global/guia-cenas.js": "76e03cfe9f6471b663575c0d1c13548f115584e9d2a768961a2af50627df6ae4",
     "js-global/leitor.js": "df4bd1ddb7d2fa4a00e2d50b2627be00f3fe5927c47294cc7ee1a507dcb26038",
@@ -37,7 +37,7 @@
     "obra-1/writed/cap-5c76f32d688743ce9161a2b627808458.html": "dfadca1706730553e8d03a3e5128de5bbdc06ce05a2e20ae00991a03989c053e",
     "obra-1/writed/saga-1/volume-1/arco-1/capitulo-01.html": "90477e0d68897ade953a3b09176b902981609ebe08a5d9eacb42cac919584a97",
     "obra-1/writed/saga-1/volume-1/arco-1/capitulo-02.html": "ce30c32414ea25ce0dfdac3ea6966fa80be9a9d8c84122d43bc514845f50072d",
-    "privacidade.html": "7e9753a48ee0319122c6403c20607fda317a9f37904b7f513e25dd414113016a"
+    "privacidade.html": "812a1bd87480c1ff7585f40d23748161684edfc7954dee67da32f12f23b82201"
   },
-  "conteudo_sha256": "931bcb191fd3faa0de860ae44bf7aceb9371c2897574d5dec2907a58754a2d42"
+  "conteudo_sha256": "f02ff4826aaca7a3854a64cc1c865b754983a609d08f832c77ef145f77610c26"
 }

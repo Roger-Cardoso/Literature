@@ -17,3 +17,9 @@
 .comentarios-form textarea { resize:vertical; }
 .comentarios-form .comentarios-armadilha { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
 @media(max-width:500px) { .comentarios-form,.comentario { padding:.75rem; }.comentario-resposta { margin-left:.4rem; } }
+.comentario-spoiler { border:1px dashed currentColor; border-radius:.4rem; padding:.7rem; }
+.comentario-spoiler summary { cursor:pointer; font-weight:bold; }
+.comentarios-form .comentarios-opcao { display:flex; align-items:center; gap:.7rem; }
+.comentarios-form .comentarios-opcao input { width:auto; margin:0; flex:0 0 auto; order:-1; }
+.comentarios-form blockquote { margin:.5rem 0; padding:.5rem 1rem; border-left:3px solid currentColor; font-size:.85rem; white-space:pre-wrap; overflow-wrap:anywhere; }
+.comentario-destinatario { font-weight:bold; margin-bottom:.2rem; }

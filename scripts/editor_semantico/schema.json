@@ -1,0 +1,520 @@
+{
+    "version": 1,
+    "id_width": 9,
+    "entity_types": [
+        "character",
+        "creature",
+        "location",
+        "environment",
+        "item",
+        "structure",
+        "phenomenon",
+        "event"
+    ],
+    "section": {
+        "id_prefix_by_scope": {
+            "chapter": "chapter",
+            "scene": "scene"
+        },
+        "attributes": {
+            "data-scope": {
+                "kind": "enum",
+                "values": [
+                    "chapter",
+                    "scene"
+                ],
+                "required": true,
+                "default": "scene"
+            },
+            "data-pov-type": {
+                "kind": "enum",
+                "values": [
+                    "first_person",
+                    "second_person",
+                    "third_person_limited",
+                    "third_person_omniscient",
+                    "objective",
+                    "multiple"
+                ],
+                "required": false,
+                "default": "third_person_limited"
+            },
+            "data-pov-character": {
+                "kind": "entity_ref",
+                "entity_types": [
+                    "character",
+                    "location",
+                    "item",
+                    "event"
+                ],
+                "required": false,
+                "multiple": true
+            }
+        }
+    },
+    "roles": {
+        "narration": {
+            "label": "Narração",
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "narration",
+                    "required": true
+                },
+                "data-narration-type": {
+                    "kind": "enum",
+                    "values": [
+                        "action",
+                        "exposition",
+                        "summary",
+                        "transition",
+                        "backstory",
+                        "reflection"
+                    ],
+                    "required": false
+                }
+            },
+            "html_tag": "p",
+            "allow_inline": true
+        },
+        "description": {
+            "label": "Descrição",
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "description",
+                    "required": true
+                },
+                "data-target-type": {
+                    "kind": "enum",
+                    "values": [
+                        "character",
+                        "creature",
+                        "location",
+                        "environment",
+                        "item",
+                        "structure",
+                        "phenomenon",
+                        "event"
+                    ],
+                    "required": false
+                },
+                "data-target": {
+                    "kind": "entity_ref",
+                    "entity_types": [
+                        "character",
+                        "creature",
+                        "location",
+                        "environment",
+                        "item",
+                        "structure",
+                        "phenomenon",
+                        "event"
+                    ],
+                    "required": false,
+                    "multiple": true
+                },
+                "data-description-aspect": {
+                    "kind": "enum",
+                    "values": [
+                        "general",
+                        "appearance",
+                        "body",
+                        "clothing",
+                        "architecture",
+                        "weather",
+                        "condition",
+                        "movement",
+                        "action",
+                        "sensory"
+                    ],
+                    "required": false,
+                    "multiple": true
+                }
+            },
+            "html_tag": "p",
+            "allow_inline": true
+        },
+        "dialogue": {
+            "label": "Diálogo",
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "dialogue",
+                    "required": true
+                },
+                "data-speaker": {
+                    "kind": "entity_ref",
+                    "entity_types": [
+                        "character"
+                    ],
+                    "required": true,
+                    "multiple": false
+                },
+                "data-addressee": {
+                    "kind": "entity_ref",
+                    "entity_types": [
+                        "character"
+                    ],
+                    "required": false,
+                    "multiple": true
+                },
+                "data-medium": {
+                    "kind": "enum",
+                    "values": [
+                        "spoken",
+                        "written",
+                        "telepathy"
+                    ],
+                    "required": false,
+                    "default": "spoken"
+                },
+                "data-speech-act": {
+                    "kind": "enum",
+                    "values": [
+                        "statement",
+                        "question",
+                        "command",
+                        "request",
+                        "promise",
+                        "threat",
+                        "warning",
+                        "apology",
+                        "greeting",
+                        "farewell",
+                        "accusation",
+                        "denial",
+                        "confirmation",
+                        "refusal",
+                        "suggestion",
+                        "invitation",
+                        "explanation",
+                        "joke",
+                        "insult",
+                        "praise",
+                        "confession"
+                    ],
+                    "required": false,
+                    "multiple": true
+                },
+                "data-interaction-role": {
+                    "kind": "enum",
+                    "values": [
+                        "initiative",
+                        "response",
+                        "reply",
+                        "counter_reply",
+                        "follow_up",
+                        "interruption"
+                    ],
+                    "required": false
+                },
+                "data-response-to": {
+                    "kind": "text_ref",
+                    "required": false,
+                    "multiple": true
+                }
+            },
+            "html_tag": "p",
+            "allow_inline": true
+        },
+        "thought": {
+            "label": "Pensamento",
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "thought",
+                    "required": true
+                },
+                "data-thinker": {
+                    "kind": "entity_ref",
+                    "entity_types": [
+                        "character"
+                    ],
+                    "required": true,
+                    "multiple": false
+                },
+                "data-thought-form": {
+                    "kind": "enum",
+                    "values": [
+                        "internal_monologue",
+                        "free_indirect",
+                        "stream_of_consciousness"
+                    ],
+                    "required": false
+                },
+                "data-thought-type": {
+                    "kind": "enum",
+                    "values": [
+                        "reflection",
+                        "memory",
+                        "imagination",
+                        "reasoning",
+                        "emotion",
+                        "intention",
+                        "decision"
+                    ],
+                    "required": false,
+                    "multiple": true
+                }
+            },
+            "html_tag": "p",
+            "allow_inline": true
+        },
+        "title": {
+            "label": "Título",
+            "html_tag": "h1",
+            "html_tag_by_attribute": {
+                "attribute": "data-title-level",
+                "map": {
+                    "work": "h1",
+                    "volume": "h1",
+                    "chapter": "h2",
+                    "scene": "h3",
+                    "section": "h4",
+                    "subsection": "h5",
+                    "minor": "h6"
+                },
+                "default": "h2"
+            },
+            "allow_inline": false,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "title",
+                    "required": true
+                },
+                "data-title-level": {
+                    "kind": "enum",
+                    "values": [
+                        "work",
+                        "volume",
+                        "chapter",
+                        "scene",
+                        "section",
+                        "subsection",
+                        "minor"
+                    ],
+                    "required": true,
+                    "default": "chapter"
+                }
+            }
+        },
+        "subtitle": {
+            "label": "Subtítulo",
+            "html_tag": "h2",
+            "allow_inline": false,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "subtitle",
+                    "required": true
+                },
+                "data-subtitle-of": {
+                    "kind": "text_ref",
+                    "required": false,
+                    "multiple": false
+                }
+            }
+        },
+        "epigraph": {
+            "label": "Epígrafe",
+            "html_tag": "blockquote",
+            "allow_inline": false,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "epigraph",
+                    "required": true
+                },
+                "data-source": {
+                    "kind": "text",
+                    "required": false
+                },
+                "data-author": {
+                    "kind": "text",
+                    "required": false
+                }
+            }
+        },
+        "quotation": {
+            "label": "Citação",
+            "html_tag": "blockquote",
+            "inline_tag": "q",
+            "allow_inline": true,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "quotation",
+                    "required": true
+                },
+                "data-source": {
+                    "kind": "text",
+                    "required": false
+                },
+                "data-speaker": {
+                    "kind": "entity_ref",
+                    "entity_types": [
+                        "character"
+                    ],
+                    "required": false,
+                    "multiple": false
+                }
+            }
+        },
+        "citation": {
+            "label": "Fonte / autoria citada",
+            "html_tag": "cite",
+            "inline_tag": "cite",
+            "allow_inline": true,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "citation",
+                    "required": true
+                }
+            }
+        },
+        "aside": {
+            "label": "Apartado / informação paralela",
+            "html_tag": "aside",
+            "allow_inline": false,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "aside",
+                    "required": true
+                },
+                "data-aside-type": {
+                    "kind": "enum",
+                    "values": [
+                        "author_note",
+                        "narrator_note",
+                        "context",
+                        "annotation",
+                        "digression"
+                    ],
+                    "required": false
+                }
+            }
+        },
+        "time_reference": {
+            "label": "Referência temporal",
+            "html_tag": "time",
+            "inline_tag": "time",
+            "allow_inline": true,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "time_reference",
+                    "required": true
+                },
+                "datetime": {
+                    "kind": "text",
+                    "required": false
+                }
+            }
+        },
+        "foreign_term": {
+            "label": "Termo estrangeiro",
+            "html_tag": "i",
+            "inline_tag": "i",
+            "allow_inline": true,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "foreign_term",
+                    "required": true
+                },
+                "lang": {
+                    "kind": "text",
+                    "required": false
+                }
+            }
+        },
+        "marked_passage": {
+            "label": "Trecho destacado semanticamente",
+            "html_tag": "mark",
+            "inline_tag": "mark",
+            "allow_inline": true,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "marked_passage",
+                    "required": true
+                },
+                "data-mark-type": {
+                    "kind": "enum",
+                    "values": [
+                        "important",
+                        "clue",
+                        "foreshadowing",
+                        "motif",
+                        "callback",
+                        "editorial"
+                    ],
+                    "required": false,
+                    "multiple": true
+                }
+            }
+        },
+        "inserted_text": {
+            "label": "Texto inserido",
+            "html_tag": "ins",
+            "inline_tag": "ins",
+            "allow_inline": true,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "inserted_text",
+                    "required": true
+                },
+                "datetime": {
+                    "kind": "text",
+                    "required": false
+                }
+            }
+        },
+        "deleted_text": {
+            "label": "Texto removido",
+            "html_tag": "del",
+            "inline_tag": "del",
+            "allow_inline": true,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "deleted_text",
+                    "required": true
+                },
+                "datetime": {
+                    "kind": "text",
+                    "required": false
+                }
+            }
+        },
+        "section_break": {
+            "label": "Quebra temática / transição",
+            "html_tag": "hr",
+            "void_element": true,
+            "allow_inline": false,
+            "attributes": {
+                "data-role": {
+                    "kind": "const",
+                    "value": "section_break",
+                    "required": true
+                },
+                "data-break-type": {
+                    "kind": "enum",
+                    "values": [
+                        "scene",
+                        "time",
+                        "location",
+                        "pov",
+                        "thematic"
+                    ],
+                    "required": false
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,6 @@
+/* Área opcional e externa de discussão, separada do texto literário. */
+.comentarios-literature { margin:3rem 0 1.5rem; padding:1.5rem 0; border-top:1px solid currentColor; font-family:Verdana,sans-serif; font-size:.9rem; line-height:1.65; }
+.comentarios-literature h2 { font-family:Georgia,serif; font-size:1.6rem; }
+.comentarios-literature button { display:block; margin:1rem 0; padding:.7rem 1rem; cursor:pointer; }
+.comentarios-literature a { text-decoration:underline; }
+.comentarios-literature #disqus_thread { margin-top:1.5rem; min-width:0; }

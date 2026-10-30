@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+site/
+.site-anterior/
+.unilit-build-*/
+
+.literature-backups/
+.edicao-*
+
+.literature-lixeira/

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "url_publica": "https://literatura.roger.cardoso.nom.br",
+  "disqus": {
+    "ativado": false,
+    "shortname": "",
+    "obras": true,
+    "capitulos": true
+  }
+}

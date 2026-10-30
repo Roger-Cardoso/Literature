@@ -1,4 +1,9 @@
 {
+  "reacoes": {
+    "ativado": true,
+    "obras": true,
+    "capitulos": true
+  },
   "schema_version": 2,
   "url_publica": "https://literatura.roger.cardoso.nom.br",
   "comentarios": {

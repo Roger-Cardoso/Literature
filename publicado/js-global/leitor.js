@@ -131,6 +131,7 @@ async function iniciar() {
         $('sumario-obra').textContent=obra.titulo;
         $('tempo-leitura').textContent=`${atual.palavras.toLocaleString('pt-BR')} palavras · ${Math.max(1,Math.ceil(atual.palavras/225))} min de leitura`;
         navegacao(capitulos.indexOf(atual));conclusao();
+        window.ReacoesLiterature?.montar({obra,capitulo:atual,destino:$('reacoes')});
         window.ComentariosLiterature?.montar({obra,capitulo:atual,destino:$('comentarios')});
         const guia=GuiaCenas.montar({capitulo:atual,destino:$('guia-leitura'),raiz:$('content-area'),proximo:capitulos[capitulos.indexOf(atual)+1],ir:irCena});
         if(guia){

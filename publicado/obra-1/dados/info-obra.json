@@ -88,8 +88,11 @@
     "alt": "Capa de A Lenda do Sertão"
   },
   "comentarios": "ativado",
+  "endereco_publico": "a-lenda-do-sertao",
+  "enderecos_anteriores": [],
   "capa_url": "/assets/imagens/sertao-cover.svg",
   "status": "Em Lançamento",
   "total_capitulos": 3,
-  "total_palavras": 2001
+  "total_palavras": 2001,
+  "url_publica": "/a-lenda-do-sertao/"
 }

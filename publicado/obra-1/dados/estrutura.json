@@ -52,8 +52,10 @@
                       "avisos_conteudo": []
                     }
                   ],
+                  "numero_url": 1,
                   "palavras": 518,
-                  "data_publicacao": "2026-06-13"
+                  "data_publicacao": "2026-06-13",
+                  "url_publica": "/a-lenda-do-sertao/capitulo-1/"
                 },
                 {
                   "id": "obra-1-cap-002",
@@ -77,8 +79,10 @@
                       "avisos_conteudo": []
                     }
                   ],
+                  "numero_url": 2,
                   "palavras": 435,
-                  "data_publicacao": "2026-06-13"
+                  "data_publicacao": "2026-06-13",
+                  "url_publica": "/a-lenda-do-sertao/capitulo-2/"
                 },
                 {
                   "id": "cap-5c76f32d688743ce9161a2b627808458",
@@ -95,8 +99,10 @@
                   "verbetes_ids": [],
                   "personagens_ids": [],
                   "comentarios": "ativado",
+                  "numero_url": 3,
                   "palavras": 1048,
-                  "data_publicacao": "2026-10-29"
+                  "data_publicacao": "2026-10-29",
+                  "url_publica": "/a-lenda-do-sertao/capitulo-3/"
                 }
               ],
               "id": "obra-1-saga-001-volume-001-arco-001",

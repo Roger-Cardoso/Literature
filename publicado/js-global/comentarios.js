@@ -12,7 +12,9 @@
   const url=new URL(config.url_publica);
   if(url.protocol!=='https:'||url.username||url.password||url.port||!['','/'].includes(url.pathname)||url.search||url.hash)throw Error('Endereço público inválido.');
   if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(obra.slug)||!obra.id_obra||(capitulo&&!capitulo.id))throw Error('Identidade incompleta.');
-  const pagina=new URL(`${obra.slug}/${capitulo?'leitor.html':'index-obra.html'}`,url.origin+'/');if(capitulo)pagina.searchParams.set('id',capitulo.id);
+  const caminho=(capitulo||obra).url_publica;
+  if(caminho&&(!/^\/[a-z0-9-]+\/(?:capitulo-[1-9][0-9]*\/)?$/.test(caminho)))throw Error('Endereço de leitura inválido.');
+  const pagina=new URL(caminho||`${obra.slug}/${capitulo?'leitor.html':'index-obra.html'}`,url.origin+'/');if(capitulo&&!caminho)pagina.searchParams.set('id',capitulo.id);
   return {identifier:JSON.stringify(['literature',String(obra.id_obra),capitulo?String(capitulo.id):null]),url:pagina.href,title:capitulo?`${capitulo.titulo} — ${obra.titulo}`:obra.titulo};
  }
  function apiUrl(config){

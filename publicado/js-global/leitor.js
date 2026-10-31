@@ -77,7 +77,7 @@ function sumario() {
         const grupo=document.createElement('section'),h=document.createElement('h3');
         h.textContent=[s.nome,v.nome,a.nome].join(' / ');grupo.append(h);
         for(const c of lista) {
-            const link=document.createElement('a');link.href='?id='+encodeURIComponent(c.id);
+            const link=document.createElement('a');link.href=c.url_publica||'?id='+encodeURIComponent(c.id);
             link.textContent=`${c.numero||c.ordem} · ${c.titulo}${lidos.includes(c.id)?' · Concluído':''}`;
             if(c.id===atual.id)link.setAttribute('aria-current','page');
             grupo.append(link);
@@ -97,7 +97,7 @@ function irCena(ancora) {
 function navegacao(indice) {
     for(const [id,offset,nome] of [['btn-prev',-1,'Anterior'],['btn-next',1,'Próximo'],['fim-prev',-1,'Anterior'],['fim-next',1,'Próximo']]) {
         const el=$(id),dest=capitulos[indice+offset];el.replaceChildren();
-        if(dest) {el.href='?id='+encodeURIComponent(dest.id);el.classList.remove('disabled');el.removeAttribute('aria-disabled');}
+        if(dest) {el.href=dest.url_publica||'?id='+encodeURIComponent(dest.id);el.classList.remove('disabled');el.removeAttribute('aria-disabled');}
         else {el.removeAttribute('href');el.classList.add('disabled');el.setAttribute('aria-disabled','true');}
         const label=document.createElement('span');label.textContent=(offset<0?'← ':'')+nome+(offset>0?' →':'');el.append(label);
         if(id.startsWith('fim-')) {const titulo=document.createElement('strong');titulo.textContent=dest?dest.titulo:offset<0?'Início da obra':'Fim dos capítulos publicados';el.append(titulo);}
@@ -114,14 +114,16 @@ async function iniciar() {
     const destinoSolicitado=new URLSearchParams(location.search).get('cena');
     if(destinoSolicitado)$('content-area').style.visibility='hidden';
     try {
-        const respostas=await Promise.all([fetch('dados/info-obra.json'),fetch('dados/estrutura.json')]);
+        const respostas=await Promise.all([fetch('dados/info-obra.json',{cache:'no-store'}),fetch('dados/estrutura.json',{cache:'no-store'})]);
         if(respostas.some(r=>!r.ok))throw Error('Não foi possível abrir os dados da obra.');
         [obra,estrutura]=await Promise.all(respostas.map(r=>r.json()));
         capitulos=Unilit.capitulos(estrutura);
-        const id=new URLSearchParams(location.search).get('id');
+        for(const link of document.querySelectorAll('[data-link-obra]'))link.href=obra.url_publica||'index-obra.html';
+        const id=document.querySelector?.('meta[name="literature-capitulo"]')?.content||new URLSearchParams(location.search).get('id');
         const retomar=Unilit.ler(`unilit:v2:retomar:${obra.id_obra}`,{});
         atual=id===null?(capitulos.find(c=>c.id===retomar.capitulo)||capitulos[0]):capitulos.find(c=>c.id===id||String(c.id_legado)===id);
         if(!atual)throw Error('Capítulo não encontrado. Volte ao índice para escolher outra leitura.');
+        if(atual.url_publica&&location.pathname!==atual.url_publica){const parametros=new URLSearchParams(location.search);parametros.delete('id');const extra=parametros.toString();location.replace(atual.url_publica+(extra?'?'+extra:'')+location.hash);return;}
         const resposta=await fetch(atual.arquivo);if(!resposta.ok)throw Error('Não foi possível abrir este capítulo.');
         $('content-area').innerHTML=await resposta.text();
         ContextoLiterature.montar({obra,estrutura,capitulo:atual,raiz:$('content-area'),destino:$('contexto-capitulo')});

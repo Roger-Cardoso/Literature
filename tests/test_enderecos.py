@@ -32,7 +32,7 @@ class EnderecosTest(unittest.TestCase):
    self.assertEqual(antes,(root/'obra-1/dados/editorial.json').read_bytes())
    self.assertTrue((out/'a-lenda-do-sertao/index.html').exists());html=(out/'a-lenda-do-sertao/capitulo-3/index.html').read_text();self.assertIn('<base href="/obra-1/">',html);self.assertIn('name="literature-capitulo" content="obra-1-cap-003"',html);self.assertIn('rel="canonical"',html)
    self.assertIn('location.replace',(out/'obra-1/index-obra.html').read_text());self.assertIn('atual.url_publica',(out/'js-global/leitor.js').read_text())
-   dto=json.loads((out/'obra-1/dados/estrutura.json').read_text());caps=[n.item for n in __import__('hierarquia').nos(dto) if n.tipo=='capitulo'];self.assertEqual(caps[2]['url_publica'],'/a-lenda-do-sertao/capitulo-3/');self.assertEqual(caps[2]['id'],'obra-1-cap-003')
+   dto=json.loads((out/'obra-1/dados/estrutura.json').read_text());self.assertNotIn('proximo_numero_url',dto);caps=[n.item for n in __import__('hierarquia').nos(dto) if n.tipo=='capitulo'];self.assertEqual(caps[2]['url_publica'],'/a-lenda-do-sertao/capitulo-3/');self.assertEqual(caps[2]['id'],'obra-1-cap-003')
    self.assertEqual(json.loads((out/'catalogo.json').read_text())[0]['url_publica'],'/a-lenda-do-sertao/')
    busca=json.loads((out/'busca.json').read_text());self.assertTrue(all('leitor.html' not in x['url'] for x in busca['itens']))
    info,rev=p.ler('obra-1/dados/info-obra.json');info['endereco_publico']='outra-rota';p.salvar('obra-1/dados/info-obra.json',info,rev);gerar(root)

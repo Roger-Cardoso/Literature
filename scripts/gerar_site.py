@@ -167,6 +167,7 @@ def preparar(root):
             info['status']={'planejamento':'Em Planejamento','em_andamento':'Em Lançamento','pausada':'Pausada','concluida':'Concluída'}[info['estado_obra']]
             info.update(total_capitulos=fonte['total_capitulos'],total_palavras=fonte['total_palavras'])
             info,fonte=enderecos.publicar(info,fonte)
+            fonte.pop('proximo_numero_url',None)  # Contador editorial, sem utilidade pública.
             resultados.append((pasta,info,fonte,arquivos))
     enderecos.validar_catalogo(enderecos_obras)
     return resultados

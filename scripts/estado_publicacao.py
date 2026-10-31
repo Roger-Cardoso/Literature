@@ -11,7 +11,7 @@ def _hash(caminho,mtime,tamanho):
 def assinatura_fontes(root):
     root=Path(root);registro=json.loads((root/'obras.json').read_text(encoding='utf-8'))
     pastas=['home','css-global','js-global','assets',*registro['obras']]
-    arquivos={root/n for n in ('configuracao-site.json','scripts/configuracao_site.py','obras.json','index.html','index-app.html','404.html','privacidade.html','CNAME','.nojekyll','scripts/gerar_site.py','scripts/exportar_offline.py','scripts/contrato_semantico.py','scripts/estado_publicacao.py','scripts/hierarquia.py','scripts/personagens.py','scripts/identidade_semantica.py') if (root/n).is_file()}
+    arquivos={root/n for n in ('configuracao-site.json','scripts/configuracao_site.py','scripts/enderecos.py','obras.json','index.html','index-app.html','404.html','privacidade.html','CNAME','.nojekyll','scripts/gerar_site.py','scripts/exportar_offline.py','scripts/contrato_semantico.py','scripts/estado_publicacao.py','scripts/hierarquia.py','scripts/personagens.py','scripts/identidade_semantica.py') if (root/n).is_file()}
     for pasta in pastas:
         base=root/pasta
         if not base.resolve().is_relative_to(root.resolve()):raise ValueError('Pasta de fontes fora do projeto.')

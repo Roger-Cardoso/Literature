@@ -29,9 +29,9 @@ class ObrasMixin:
  def nova_obra(self):
   if not self._continuar_obras():return
   painel=OverlayPanel(self,'Nova obra',width=720,height=530,scrollable=True);campos={}
-  for chave,texto in [('titulo','Título'),('autor','Autor'),('slug','Endereço da obra — letras minúsculas, números e hífens')]:
+  for chave,texto in [('titulo','Título'),('autor','Autor'),('slug','Pasta interna — letras minúsculas, números e hífens')]:
    ttk.Label(painel.body,text=texto).pack(anchor='w',pady=(12,4));w=ttk.Entry(painel.body);w.pack(fill='x');campos[chave]=w
-  ttk.Label(painel.body,text='A obra será criada como rascunho, com identidade própria e estrutura vazia. O endereço é permanente; o título poderá mudar.',wraplength=600).pack(anchor='w',pady=15)
+  ttk.Label(painel.body,text='A obra será criada como rascunho, com identidade própria e estrutura vazia. A pasta interna é permanente. O endereço público será sugerido a partir do título e poderá ser ajustado na ficha da obra.',wraplength=600).pack(anchor='w',pady=15)
   campos['titulo'].focus_set()
   def criar():
    try:
@@ -65,10 +65,10 @@ class ObrasMixin:
   try:
    if self.editor and self.editor.vinculo and self.editor.vinculo['slug']==slug and not self.salvar_autoria():return
    proposta=self.projeto.preparar_exclusao_obra(slug);painel=OverlayPanel(self,'Excluir obra com recuperação',width=760,height=510)
-   ttk.Label(painel.body,text=f"{proposta['titulo']}\nEndereço: {slug}\n\nA obra será retirada do cadastro. Sua pasta completa, incluindo capítulos e autorias salvas, ficará na recuperação local. Recursos compartilhados continuarão no projeto. O editor aberto desta obra será fechado. O site gerado anteriormente só muda ao gerar novamente.\n\nDigite o endereço da obra para confirmar:",wraplength=640).pack(anchor='w',pady=15)
+   ttk.Label(painel.body,text=f"{proposta['titulo']}\nPasta interna: {slug}\n\nA obra será retirada do cadastro. Sua pasta completa, incluindo capítulos e autorias salvas, ficará na recuperação local. Recursos compartilhados continuarão no projeto. O editor aberto desta obra será fechado. O site gerado anteriormente só muda ao gerar novamente.\n\nDigite a pasta interna da obra para confirmar:",wraplength=640).pack(anchor='w',pady=15)
    confirmar=ttk.Entry(painel.body);confirmar.pack(fill='x')
    def aplicar():
-    if confirmar.get()!=slug:painel.set_error('Digite exatamente o endereço da obra.');return
+    if confirmar.get()!=slug:painel.set_error('Digite exatamente a pasta interna da obra.');return
     try:
      if self.editor and self.editor.vinculo and self.editor.vinculo['slug']==slug and self.editor.dirty:
       painel.set_error('A autoria mudou. Feche esta revisão e salve antes de excluir.');return

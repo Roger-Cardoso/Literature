@@ -15,6 +15,7 @@ const all=w=>[w,...w.children.flatMap(all)];
  }};vm.createContext(ctx);vm.runInContext(fs.readFileSync('js-global/comentarios.js','utf8'),ctx);
  const api=ctx.window.ComentariosLiterature,obra={id_obra:'obra-uuid',slug:'minha-obra',titulo:'Título'},cap={id:'cap-uuid',titulo:'Capítulo'},destino=new Elemento('section');
  const a=api.identidade(config,obra,cap),b=api.identidade(config,{...obra,titulo:'Outro título',slug:'outro-endereco'},cap);assert.equal(a.identifier,b.identifier);assert.equal(a.url,config.url_publica+'/minha-obra/leitor.html?id=cap-uuid');
+ const pretty=api.identidade(config,{...obra,url_publica:'/a-lenda-do-sertao/'},{...cap,url_publica:'/a-lenda-do-sertao/capitulo-3/'});assert.equal(pretty.identifier,a.identifier);assert.equal(pretty.url,config.url_publica+'/a-lenda-do-sertao/capitulo-3/');
  assert.equal(api.permitido(config,{...obra,comentarios:'desativado'},{...cap,comentarios:'ativado'}),false);config.comentarios.capitulos=false;assert.equal(api.permitido(config,obra,cap),false);assert.equal(api.permitido(config,obra,{...cap,comentarios:'ativado'}),true);config.comentarios.capitulos=true;
  await api.montar({obra,capitulo:cap,destino});assert.equal(destino.hidden,false);assert.equal(reads,0);assert.equal(head.children.length,0,'Nenhuma conexão externa antes do clique');
  await all(destino).find(e=>e.tag==='button'&&e.textContent==='Abrir comentários').onclick();assert.equal(reads,1);assert.equal(head.children.length,0,'Abrir conversa não carrega Turnstile');

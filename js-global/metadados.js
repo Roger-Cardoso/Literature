@@ -1,5 +1,7 @@
 /* Compatibilidade do histórico legado e proteção contra falhas de armazenamento. */
 window.Unilit = {
+    urlCapitulo(c) { return c.url_publica || 'leitor.html?id='+encodeURIComponent(c.id); },
+    urlObra(o) { return o.url_publica || 'index-obra.html'; },
     ler(chave, padrao) {
         try { const valor = JSON.parse(localStorage.getItem(chave)); return valor ?? padrao; }
         catch (_) { return padrao; }

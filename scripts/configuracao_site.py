@@ -54,7 +54,7 @@ def manifesto_comentarios(config,resultados):
     for slug,info,estrutura,_ in resultados:
         def incluir(cap=None):
             ident=json.dumps(['literature',info['id_obra'],cap['id'] if cap else None],ensure_ascii=False,separators=(',',':'))
-            url=config['url_publica']+'/'+slug+('/leitor.html?'+urlencode({'id':cap['id']}) if cap else '/index-obra.html')
+            url=config['url_publica']+((cap or info).get('url_publica') or '/'+slug+('/leitor.html?'+urlencode({'id':cap['id']}) if cap else '/index-obra.html'))
             threads.append({'id':ident,'title':cap['titulo']+' — '+info['titulo'] if cap else info['titulo'],'url':url,'comments_enabled':comentarios_permitidos(config,info,cap),'reactions_enabled':reacoes_permitidas(config,info,cap)})
         if comentarios_permitidos(config,info) or reacoes_permitidas(config,info):incluir()
         for s in estrutura['sagas']:

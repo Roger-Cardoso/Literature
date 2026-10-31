@@ -221,10 +221,10 @@
     </div>
 
     <footer class="site-footer"><span class="footer-brand">Literature.</span><span class="footer-note">Histórias para habitar. Universos para descobrir.</span><span>Por Roger Cardoso</span></footer>
-    <script src="../js-global/guia-cenas.js"></script>
-    <script src="../js-global/comentarios.js?v=20261030-reacoes2"></script>
-    <script src="../js-global/reacoes.js?v=20261030-2"></script>
-    <script src="../js-global/metadados.js"></script>
+    <script src="../js-global/guia-cenas.js?v=20261031-enderecos1"></script>
+    <script src="../js-global/comentarios.js?v=20261031-enderecos1"></script>
+    <script src="../js-global/reacoes.js?v=20261031-enderecos1"></script>
+    <script src="../js-global/metadados.js?v=20261031-enderecos1"></script>
     <script>
         let estruturaGlobal = null;
         let infoGlobal = null;
@@ -232,8 +232,8 @@
         async function inicializarPagina() {
             try {
                 const [resInfo, resEstrutura] = await Promise.all([
-                    fetch('dados/info-obra.json'),
-                    fetch('dados/estrutura.json')
+                    fetch('dados/info-obra.json',{cache:'no-store'}),
+                    fetch('dados/estrutura.json',{cache:'no-store'})
                 ]);
                 
                 infoGlobal = await resInfo.json();
@@ -256,7 +256,7 @@
                 const capRetomada = Unilit.capitulos(estruturaGlobal).find(c => c.id === posicao.capitulo);
                 if (capRetomada) {
                     const continuar = document.getElementById('ui-btn-continuar');
-                    continuar.href = `leitor.html?id=${encodeURIComponent(capRetomada.id)}`;
+                    continuar.href = Unilit.urlCapitulo(capRetomada);
                     continuar.textContent = `Continuar · ${capRetomada.titulo}`;
                     continuar.hidden = false;
                 }
@@ -305,7 +305,7 @@
             itens.forEach((item,i)=>{if(i)metadados.append(elemento('span','•','meta-dot'));metadados.append(item);});
 
             if (estruturaGlobal.total_capitulos > 0) {
-                document.getElementById('ui-btn-ler').href = `leitor.html?id=${Unilit.capitulos(estruturaGlobal)[0].id}`;
+                document.getElementById('ui-btn-ler').href = Unilit.urlCapitulo(Unilit.capitulos(estruturaGlobal)[0]);
             } else {
                 document.getElementById('ui-btn-ler').style.display = 'none';
             }
@@ -404,7 +404,7 @@
                         }
                         const destino=document.createElement('div');destino.dataset.guiaCapitulo=cap.id;card.append(destino);
                         const acoes=elemento('div','','dic-acoes'),botoes=elemento('div','','dic-botoes-leitura'),link=elemento('a','Ler Capítulo','btn-dic-primario');
-                        link.href='leitor.html?id='+encodeURIComponent(cap.id);botoes.append(link);acoes.append(botoes);card.append(acoes);container.append(card);
+                        link.href=Unilit.urlCapitulo(cap);botoes.append(link);acoes.append(botoes);card.append(acoes);container.append(card);
                         const todos = Unilit.capitulos(estruturaGlobal);
                         GuiaCenas.montar({capitulo:cap,destino,proximo:todos[todos.findIndex(c=>c.id===cap.id)+1]});
                     });

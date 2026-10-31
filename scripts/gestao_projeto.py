@@ -10,6 +10,7 @@ import tempfile
 import uuid
 import zipfile
 import hierarquia as hier
+import enderecos
 from personagens import validar_catalogo,validar_participacoes,participacoes,referencias_em_html,personagem_referenciado_na_autoria
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -36,7 +37,20 @@ class Projeto(ObrasProjeto):
         if p.parent.name=='dados' and p.name in {'info-obra.json','editorial.json'} and not isinstance(validando,dict):raise ValueError('Metadados da obra devem ser um objeto JSON.')
         if isinstance(validando,dict):
             pasta=p.parent
+            if pasta.name=='dados' and p.name in {'info-obra.json','editorial.json'}:
+                anterior=json.loads(p.read_text()) if p.exists() else None
+                normalizado=enderecos.obra(validando,anterior) if p.name=='info-obra.json' else enderecos.numerar(validando,anterior)
+                if isinstance(conteudo,dict):
+                    if p.name=='info-obra.json':
+                        for key in ('endereco_publico','enderecos_anteriores'):conteudo[key]=normalizado[key]
+                    else:
+                        conteudo['proximo_numero_url']=normalizado['proximo_numero_url'];numeros={n.id:n.item['numero_url'] for n in hier.nos(normalizado) if n.tipo=='capitulo'}
+                        for n in hier.nos(conteudo):
+                            if n.tipo=='capitulo':n.item['numero_url']=numeros[n.id]
+                    validando=conteudo
+                else:conteudo=json.dumps(normalizado,ensure_ascii=False,indent=2)+'\n';validando=normalizado
             if p.name=='info-obra.json' and pasta.name=='dados':
+                enderecos.validar_catalogo([(slug,enderecos.obra(validando if slug==pasta.parent.name else self.ler(f'{slug}/dados/info-obra.json')[0])) for slug in dict.fromkeys([*(self.obras() if (self.root/'obras.json').exists() else []),pasta.parent.name])])
                 validar_catalogo(validando)
                 if (pasta/'editorial.json').exists():validar_participacoes(validando,json.loads((pasta/'editorial.json').read_text(encoding='utf-8')))
             if p.name=='editorial.json' and pasta.name=='dados' and (pasta/'info-obra.json').exists():validar_participacoes(json.loads((pasta/'info-obra.json').read_text(encoding='utf-8')),validando)

@@ -3,6 +3,7 @@ from pathlib import Path
 from html.parser import HTMLParser
 from datetime import date
 import argparse
+import enderecos
 import copy
 import json
 import shutil
@@ -54,7 +55,7 @@ def validar_publico(obj, contexto):
 def preparar(root):
     carregar_configuracao(root)
     registro=ler(root/'obras.json'); exigir(registro.get('schema_version')==2,'Versão de obras.json inválida')
-    vistos=set(); resultados=[]
+    vistos=set(); resultados=[];enderecos_obras=[]
     def identidade(obj):
         ident=obj.get('id',obj.get('id_obra'))
         exigir(isinstance(ident,str) and ident and ident not in vistos,f'Identidade ausente ou duplicada: {ident}')
@@ -72,6 +73,7 @@ def preparar(root):
         for campo in ('titulo','autor','idioma','slug'):
             exigir(isinstance(info.get(campo),str) and info[campo].strip(),f'{pasta}: {campo} obrigatório')
         exigir(info['slug']==pasta,f'{pasta}: slug deve corresponder à pasta nesta versão')
+        info=enderecos.obra(info);enderecos_obras.append((pasta,info));arvore=enderecos.numerar(arvore)
         exigir(info.get('estado_publicacao') in ESTADOS,f'{pasta}: publicação inválida')
         exigir(info.get('estado_obra') in {'planejamento','em_andamento','pausada','concluida'},f'{pasta}: estado da obra inválido')
         for campo in ('tags','temas','generos','avisos_conteudo'):
@@ -164,7 +166,9 @@ def preparar(root):
             info['capa_url']=info['capa']['src']
             info['status']={'planejamento':'Em Planejamento','em_andamento':'Em Lançamento','pausada':'Pausada','concluida':'Concluída'}[info['estado_obra']]
             info.update(total_capitulos=fonte['total_capitulos'],total_palavras=fonte['total_palavras'])
+            info,fonte=enderecos.publicar(info,fonte)
             resultados.append((pasta,info,fonte,arquivos))
+    enderecos.validar_catalogo(enderecos_obras)
     return resultados
 
 def gerar(root=ROOT, destino=None):
@@ -187,19 +191,37 @@ def gerar(root=ROOT, destino=None):
             for pagina in ('index-obra.html','leitor.html'):
                 caminho(root/pasta,pagina)
             (out/pasta).mkdir(exist_ok=True)
-            for pagina in ('index-obra.html','leitor.html'):shutil.copy2(root/pasta/pagina,out/pasta/pagina)
-            gravar(out/pasta/'dados/info-obra.json',info);gravar(out/pasta/'dados/estrutura.json',estrutura)
-            for relativo,p in arquivos:
-                alvo=out/pasta/relativo;alvo.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,alvo)
-            (out/pasta/'offline.html').write_text(exportar(info,estrutura,arquivos,root),encoding='utf-8')
-            item={k:info[k] for k in ('id_obra','slug','titulo','autor','sinopse','capa_url','status','formato','tags','temas','generos','total_capitulos','total_palavras','ordem_catalogo') if k in info}
-            item['ultima_publicacao']=max(c['publicado_em'] for s in estrutura['sagas'] for v in s['volumes'] for a in v['arcos'] for c in a['capitulos'])
-            catalogo.append(item)
-            busca.append({'tipo':'obra','titulo':info['titulo'],'texto':' '.join([info['sinopse'],*info.get('tags',[]),*info.get('temas',[]),*info.get('generos',[])]),'url':f'../{pasta}/index-obra.html'})
+            fonte_obra=(root/pasta/'index-obra.html').read_text()
+            fonte_leitor=(root/pasta/'leitor.html').read_text()
+            # O acesso legado do leitor resolve o ID antigo antes de encaminhar à rota atual.
+            (out/pasta/'leitor.html').write_text(fonte_leitor,encoding='utf-8')
+            (out/pasta/'index-obra.html').write_text(enderecos.redirecionar(info['url_publica']),encoding='utf-8')
+            destino_obra=out/info['endereco_publico'];destino_obra.mkdir(exist_ok=True)
+            (destino_obra/'index.html').write_text(enderecos.pagina(fonte_obra,pasta,info['url_publica'],config['url_publica']),encoding='utf-8')
+            if pasta!=info['endereco_publico']:(out/pasta/'index.html').write_text(enderecos.redirecionar(info['url_publica']),encoding='utf-8')
+            for alias in info.get('enderecos_anteriores',[]):
+                destino_alias=out/alias;destino_alias.mkdir(exist_ok=True);(destino_alias/'index.html').write_text(enderecos.redirecionar(info['url_publica']),encoding='utf-8')
             for s in estrutura['sagas']:
                 for v in s['volumes']:
                     for a in v['arcos']:
-                        for c in a['capitulos']:busca.append({'tipo':'capitulo','titulo':c['titulo'],'texto':c.get('sinopse',''),'url':f"../{pasta}/leitor.html?id={c['id']}"})
+                        for cap in a['capitulos']:
+                            destino_cap=out/cap['url_publica'].strip('/');destino_cap.mkdir(parents=True,exist_ok=True)
+                            (destino_cap/'index.html').write_text(enderecos.pagina(fonte_leitor,pasta,cap['url_publica'],config['url_publica'],cap),encoding='utf-8')
+                            for alias in info.get('enderecos_anteriores',[]):
+                                legado=out/alias/('capitulo-'+str(cap['numero_url']));legado.mkdir(parents=True,exist_ok=True);(legado/'index.html').write_text(enderecos.redirecionar(cap['url_publica']),encoding='utf-8')
+            gravar(out/pasta/'dados/info-obra.json',info);gravar(out/pasta/'dados/estrutura.json',estrutura)
+            recursos_publicados=set()
+            for relativo,p in arquivos:
+                alvo=out/pasta/relativo;exigir(not alvo.exists() or relativo in recursos_publicados,'Recurso sobrepõe uma página pública: '+relativo);recursos_publicados.add(relativo);alvo.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,alvo)
+            (out/pasta/'offline.html').write_text(exportar(info,estrutura,arquivos,root),encoding='utf-8')
+            item={k:info[k] for k in ('id_obra','slug','titulo','autor','sinopse','capa_url','status','formato','tags','temas','generos','total_capitulos','total_palavras','ordem_catalogo','url_publica','endereco_publico') if k in info}
+            item['ultima_publicacao']=max(c['publicado_em'] for s in estrutura['sagas'] for v in s['volumes'] for a in v['arcos'] for c in a['capitulos'])
+            catalogo.append(item)
+            busca.append({'tipo':'obra','titulo':info['titulo'],'texto':' '.join([info['sinopse'],*info.get('tags',[]),*info.get('temas',[]),*info.get('generos',[])]),'url':info['url_publica']})
+            for s in estrutura['sagas']:
+                for v in s['volumes']:
+                    for a in v['arcos']:
+                        for c in a['capitulos']:busca.append({'tipo':'capitulo','titulo':c['titulo'],'texto':c.get('sinopse',''),'url':c['url_publica']})
         gravar(out/'catalogo.json',sorted(catalogo,key=lambda x:(x['ordem_catalogo'],x['id_obra'])))
         gravar(out/'busca.json',{'schema_version':2,'itens':busca})
         exigir(assinatura_fontes(root)==assinatura,'As fontes mudaram durante a geração. Gere novamente.')

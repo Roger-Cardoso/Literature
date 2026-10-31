@@ -131,3 +131,5 @@ O botão **Site e comentários** configura os comentários próprios do Literatu
 ## Publicar pelo gerenciador
 
 O botão **Publicar no GitHub** permite preparar e revisar a saída pública, enviá-la ao repositório e acompanhar a implantação na mesma janela. Usa a autenticação do GitHub CLI, protege alterações externas e pode sincronizar os comentários após a aprovação. Veja [publicar pelo Studio](docs/publicar-pelo-studio.md).
+
+Os endereços públicos usam o nome da obra e capítulos numerados, como `/a-lenda-do-sertao/capitulo-3/`. A pasta interna e os IDs permanecem independentes desses links. Consulte o [guia de endereços públicos](docs/enderecos-publicos.md) para configuração, numeração permanente e compatibilidade com links antigos.

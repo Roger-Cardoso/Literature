@@ -37,3 +37,14 @@ assert.equal(alvoCena.recebeuFoco,true);
 assert.equal(elements['aviso-navegacao'].hidden,false);
 assert.equal(storage.has('unilit:v2:progresso:obra-fixa'),false,'Pular cena não escreve conclusão');
 console.log('Navegação real do leitor: alvo, foco, aviso e ausência de conclusão automática: OK');
+(async()=>{
+ let alvo='',pedido=[];
+ content.style={};elements['main-title']={};context.document.querySelectorAll=()=>[];context.document.querySelector=()=>null;context.URLSearchParams=URLSearchParams;
+ context.location={search:'?id=cap-fixo&cena=cena-b',pathname:'/obra-antiga/leitor.html',hash:'#fim',replace:url=>{alvo=url;}};
+ context.fetch=async url=>{pedido.push(url);return url.includes('info-obra')?{ok:true,json:async()=>({id_obra:'obra-fixa',url_publica:'/livro/'})}:url.includes('estrutura')?{ok:true,json:async()=>({})}:{ok:false};};
+ context.Unilit.capitulos=()=>[{id:'cap-fixo',url_publica:'/livro/capitulo-3/',arquivo:'writed/3.html'},{id:'outro',url_publica:'/livro/capitulo-4/',arquivo:'writed/4.html'}];
+ vm.runInContext('aplicar=()=>{}',context);await vm.runInContext('iniciar()',context);assert.equal(alvo,'/livro/capitulo-3/?cena=cena-b#fim');
+ alvo='';pedido=[];context.document.querySelector=()=>({content:'cap-fixo'});context.location.pathname='/livro/capitulo-3/';context.location.search='?id=outro';await vm.runInContext('iniciar()',context);
+ assert.equal(alvo,'');assert.ok(pedido.includes('writed/3.html'),'Rota canônica abre o ID incorporado, mesmo se a consulta tentar apontar outro capítulo');assert.ok(!pedido.includes('writed/4.html'));
+ console.log('Rotas: link legado redirecionado, cena e fragmento preservados, seleção pelo ID permanente da rota canônica: OK');
+})().catch(e=>{console.error(e);process.exitCode=1;});

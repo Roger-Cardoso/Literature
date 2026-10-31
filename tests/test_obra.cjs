@@ -7,7 +7,7 @@ class El{
 }
 const ids=new Map(),obter=id=>{if(!ids.has(id))ids.set(id,new El());return ids.get(id)};
 const literal='<img src=x onerror="efeito()"> & "citação"';
-const ctx={document:{getElementById:obter,createElement:t=>new El(t),querySelector:obter},Unilit:{revelar:()=>true,capitulos:()=>[{id:'cap'}]},infoGlobal:{titulo:literal,capa_url:'/capa.svg',capa:{alt:literal},status:'Em andamento',autor:literal,sinopse:literal,formato:'publicacao_seriada',tags:[literal],lore:[{id:'verbete',titulo:literal,descricao:literal}],personagens:[{id:'ana',nome:literal,descricao_curta:literal}]},estruturaGlobal:{total_capitulos:1,total_palavras:100},calcularTempoFormatado:()=> '1 min'};
+const ctx={document:{getElementById:obter,createElement:t=>new El(t),querySelector:obter},Unilit:{urlCapitulo:c=>c.url_publica||'leitor.html?id='+encodeURIComponent(c.id),revelar:()=>true,capitulos:()=>[{id:'cap'}]},infoGlobal:{titulo:literal,capa_url:'/capa.svg',capa:{alt:literal},status:'Em andamento',autor:literal,sinopse:literal,formato:'publicacao_seriada',tags:[literal],lore:[{id:'verbete',titulo:literal,descricao:literal}],personagens:[{id:'ana',nome:literal,descricao_curta:literal}]},estruturaGlobal:{total_capitulos:1,total_palavras:100},calcularTempoFormatado:()=> '1 min'};
 const fonte=fs.readFileSync('scripts/modelos/obra/index-obra.html','utf8');const inicio=fonte.indexOf('        function elemento('),fim=fonte.indexOf('        // --- SISTEMA DE SELETORES',inicio);
 vm.createContext(ctx);vm.runInContext(fonte.slice(inicio,fim),ctx);vm.runInContext('renderizarHero();renderizarAbas()',ctx);
 assert.equal(obter('ui-titulo').innerText,literal);assert.equal(obter('ui-tags').children[1].textContent,literal);

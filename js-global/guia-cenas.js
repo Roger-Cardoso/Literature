@@ -8,7 +8,7 @@ window.GuiaCenas={
   const aviso=document.createElement('p');aviso.textContent='Consulte os avisos antes de escolher o que ler. Detalhes e resumos podem revelar acontecimentos. Pular não marca o capítulo como concluído.';painel.append(aviso);
   function acao(texto,ancora){
    const a=document.createElement('a');a.textContent=texto;
-   a.href=raiz?'#'+encodeURIComponent(ancora):'leitor.html?id='+encodeURIComponent(capitulo.id)+'&cena='+encodeURIComponent(ancora);
+   a.href=raiz?(capitulo.url_publica||'')+'#'+encodeURIComponent(ancora):(capitulo.url_publica?capitulo.url_publica+'?':'leitor.html?id='+encodeURIComponent(capitulo.id)+'&')+'cena='+encodeURIComponent(ancora);
    if(raiz)a.onclick=e=>{e.preventDefault();ir(ancora);};return a;
   }
   cenas.forEach((cena,i)=>{
@@ -26,7 +26,7 @@ window.GuiaCenas={
    nav.append(acao('Ir ao início desta cena',cena.ancora),acao(i+1<cenas.length?'Pular para a próxima cena':'Pular para o fim do capítulo',cenas[i+1]?.ancora||'fim-do-capitulo'));
    sec.append(nav);painel.append(sec);
   });
-  if(proximo){const a=document.createElement('a');a.href='leitor.html?id='+encodeURIComponent(proximo.id);a.textContent='Pular capítulo → '+proximo.titulo;painel.append(a);}
+  if(proximo){const a=document.createElement('a');a.href=proximo.url_publica||'leitor.html?id='+encodeURIComponent(proximo.id);a.textContent='Pular capítulo → '+proximo.titulo;painel.append(a);}
   else {const p=document.createElement('p');p.textContent='Este é o último capítulo publicado.';painel.append(p);}
   destino.append(painel);return painel;
  }

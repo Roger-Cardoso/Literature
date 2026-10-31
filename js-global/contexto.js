@@ -28,7 +28,7 @@ window.ContextoLiterature = {
             titulo.textContent=verbete.titulo;
             descricao.textContent=verbete.descricao;
             link.hidden=!obra.slug;
-            if(obra.slug)link.href='index-obra.html?aba=universo#verbete-'+encodeURIComponent(verbete.id);
+            if(obra.slug)link.href=(obra.url_publica||'index-obra.html')+'?aba=universo#verbete-'+encodeURIComponent(verbete.id);
             dialogo.showModal();
         };
         for(const termo of raiz.querySelectorAll('[data-verbete-id]')) {

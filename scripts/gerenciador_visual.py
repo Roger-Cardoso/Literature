@@ -12,6 +12,7 @@ import copy
 from functools import partial
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 import json
+import enderecos
 from pathlib import Path
 import queue
 import sys
@@ -28,7 +29,7 @@ from integracao_semantica import EditorLiterature
 from editor_componente import OverlayPanel
 
 ENUMS={'reacoes':['herdar','ativado','desativado'],'comentarios':['herdar','ativado','desativado'],'tipo_semantico':['character','creature'],'estado_publicacao':['rascunho','publicado','arquivado'],'estado_obra':['planejamento','em_andamento','pausada','concluida'],'relevancia':['nao_avaliada','essencial','complementar','opcional','alta','media','baixa'],'avaliacao_conteudo':['pendente','revisada'],'visibilidade':['publica','privada']}
-NOMES={'reacoes':'Reações — herdar a configuração, ativar ou desativar','comentarios':'Comentários — herdar a configuração, ativar ou desativar','tipo_semantico':'Tipo semântico (character ou creature)','id':'Identidade permanente','id_obra':'Identidade permanente','titulo':'Título','titulo_cena':'Identificação pública da cena','estado_publicacao':'Publicação','estado_obra':'Andamento da obra','publicado_em':'Primeira publicação (AAAA-MM-DD)','atualizado_em':'Atualização (AAAA-MM-DD)','avisos_conteudo':'Avisos de conteúdo — um por linha','sinopse':'Sinopse','ancora':'Âncora no texto','relevancia':'Relevância narrativa','avaliacao_conteudo':'Avaliação de conteúdo','consequencia_pular':'Consequência de pular — spoiler','resumo_alternativo':'Resumo alternativo — spoiler','descricao':'Descrição — spoiler quando for cena','tratamento':'Como o conteúdo é apresentado','ordem':'Ordem no grupo — altere em Organizar capítulos','src':'Arquivo ou endereço da imagem','alt':'Descrição alternativa da imagem','disponivel_apos_capitulo':'Disponível após concluir (ID do capítulo)','verbetes_ids':'Verbetes associados — um ID por linha','personagens_ids':'Participações — selecione personagens cadastrados na obra'}
+NOMES={'slug':'Pasta interna da obra','endereco_publico':'Endereço público da obra — minúsculas, sem acentos','numero_url':'Número permanente do endereço do capítulo','proximo_numero_url':'Próximo número de endereço disponível','reacoes':'Reações — herdar a configuração, ativar ou desativar','comentarios':'Comentários — herdar a configuração, ativar ou desativar','tipo_semantico':'Tipo semântico (character ou creature)','id':'Identidade permanente','id_obra':'Identidade permanente','titulo':'Título','titulo_cena':'Identificação pública da cena','estado_publicacao':'Publicação','estado_obra':'Andamento da obra','publicado_em':'Primeira publicação (AAAA-MM-DD)','atualizado_em':'Atualização (AAAA-MM-DD)','avisos_conteudo':'Avisos de conteúdo — um por linha','sinopse':'Sinopse','ancora':'Âncora no texto','relevancia':'Relevância narrativa','avaliacao_conteudo':'Avaliação de conteúdo','consequencia_pular':'Consequência de pular — spoiler','resumo_alternativo':'Resumo alternativo — spoiler','descricao':'Descrição — spoiler quando for cena','tratamento':'Como o conteúdo é apresentado','ordem':'Ordem no grupo — altere em Organizar capítulos','src':'Arquivo ou endereço da imagem','alt':'Descrição alternativa da imagem','disponivel_apos_capitulo':'Disponível após concluir (ID do capítulo)','verbetes_ids':'Verbetes associados — um ID por linha','personagens_ids':'Participações — selecione personagens cadastrados na obra'}
 LISTAS={'tags','temas','generos','avisos_conteudo','aliases','verbetes_ids','personagens_ids'}
 LONGOS={'sinopse','descricao','descricao_curta','texto','consequencia_pular','resumo_alternativo','tratamento'}
 class Studio(PublicacaoMixin,SiteMixin,ObrasMixin,PersonagensMixin,OrganizacaoMixin,tk.Tk):
@@ -155,7 +156,7 @@ class Studio(PublicacaoMixin,SiteMixin,ObrasMixin,PersonagensMixin,OrganizacaoMi
    if 'arquivo'in self.obj:extras={'reacoes':'herdar','comentarios':'herdar','atualizado_em':None,'verbetes_ids':[],'personagens_ids':[]}
    if 'ancora'in self.obj:extras={'personagens_ids':[],'tratamento':'','consequencia_pular':'','resumo_alternativo':'','descricao':''}
    if 'categoria'in self.obj:extras={'disponivel_apos_capitulo':None}
-   if chaves==():extras={'reacoes':'herdar','comentarios':'herdar'}
+   if chaves==():extras={'endereco_publico':enderecos.sugerir(self.obj.get('titulo','obra')),'reacoes':'herdar','comentarios':'herdar'}
    if chaves and chaves[0]=='personagens':extras={'tipo_semantico':'character','nome':'','aliases':[],'descricao_curta':'','descricao':'','imagem':'','imagem_alt':'','disponivel_apos_capitulo':None}
    for key,value in {**extras,**self.obj}.items():
     if isinstance(value,dict) or isinstance(value,list) and key not in LISTAS:continue
@@ -166,6 +167,11 @@ class Studio(PublicacaoMixin,SiteMixin,ObrasMixin,PersonagensMixin,OrganizacaoMi
     ttk.Button(self.form,text='Consultar participações deste personagem…',command=self.consultar_participacoes).pack(anchor='w',pady=8)
     ttk.Button(self.form,text='Voltar à biblioteca de personagens',command=self.gerenciar_personagens).pack(anchor='w',pady=8)
     ttk.Button(self.form,text='Excluir este personagem…',command=self.excluir_personagem).pack(anchor='w',pady=8)
+   if chaves==():
+    preview=tk.StringVar();ttk.Label(self.form,textvariable=preview,wraplength=650).pack(anchor='w',pady=8)
+    def mostrar_endereco(_e=None):preview.set('Link público: https://literatura.roger.cardoso.nom.br/'+self.widgets['endereco_publico'].get().strip()+'/')
+    self.widgets['endereco_publico'].bind('<KeyRelease>',mostrar_endereco);mostrar_endereco()
+   if 'numero_url' in self.obj:ttk.Label(self.form,text='O endereço termina em /capitulo-'+str(self.obj['numero_url'])+'/. O número fica com este capítulo mesmo ao mudar sua posição na árvore.',wraplength=650).pack(anchor='w',pady=8)
    if chaves==():ttk.Button(self.form,text='Voltar à biblioteca de obras',command=self.gerenciar_obras).pack(anchor='w',pady=10)
    if chaves==('capa',):ttk.Button(self.form,text='Importar imagem local…',command=self.imagem).pack(anchor='w',pady=10)
   self.base=self.valor()
@@ -184,7 +190,7 @@ class Studio(PublicacaoMixin,SiteMixin,ObrasMixin,PersonagensMixin,OrganizacaoMi
    w=ttk.Combobox(self.form,values=ENUMS[key],state='readonly');w.set(texto);w.pack(fill='x')
   else:
    w=ttk.Entry(self.form);w.insert(0,texto);w.pack(fill='x')
-   if key in ('id','id_obra','slug','schema_version','id_legado','arquivo','ordem'):w.configure(state='readonly')
+   if key in ('id','id_obra','slug','schema_version','id_legado','arquivo','ordem','numero_url','proximo_numero_url'):w.configure(state='readonly')
   self.widgets[key]=w
  def salvar(self):
   if self.ocupado:return False

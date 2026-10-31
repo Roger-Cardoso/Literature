@@ -41,7 +41,7 @@
         async function carregarCatalogo() {
             try {
                 // Tenta buscar o arquivo na raiz
-                const resposta = await fetch('../catalogo.json');
+                const resposta = await fetch('../catalogo.json',{cache:'no-store'});
                 
                 if (!resposta.ok) {
                     throw new Error("Arquivo catalogo.json não encontrado. Rode o gerador_universo.py primeiro.");
@@ -88,11 +88,11 @@
                 const cartaoHTML = `
                 <article class="cartao-obra">
                     <div class="linha-principal-obra">
-                        <div class="coluna-capa"><a href="../${obra.slug || obra.id_obra}/index-obra.html" tabindex="-1" aria-hidden="true"><img src="${obra.capa_url}" alt="Capa de ${obra.titulo}" class="capa-miniatura" width="400" height="600"></a><span class="status-lancamento ${classeStatus}">${obra.status}</span></div>
+                        <div class="coluna-capa"><a href="${obra.url_publica || '../'+(obra.slug || obra.id_obra)+'/index-obra.html'}" tabindex="-1" aria-hidden="true"><img src="${obra.capa_url}" alt="Capa de ${obra.titulo}" class="capa-miniatura" width="400" height="600"></a><span class="status-lancamento ${classeStatus}">${obra.status}</span></div>
                         <div class="info-texto-obra"><div class="work-kicker">Literature · Publicação seriada</div><h3 class="nome-obra">${obra.titulo}</h3>
                             <div class="metadados-limpos"><span>Por <span class="meta-destaque">${obra.autor}</span></span><span class="meta-dot">/</span><span>${(obra.temas || []).join(' · ')}</span></div>
                             <p class="sinopse-obra">${obra.sinopse}</p><button class="gatilho-ler-mais" aria-expanded="false" onclick="alternarExpansao(this.closest('article'), event)">Ler sinopse completa ↓</button>
-                            <div class="acao-obra"><div class="work-facts"><span><strong>${String(obra.total_capitulos).padStart(2, '0')}</strong> capítulos</span><span><strong>${obra.total_palavras.toLocaleString('pt-BR')}</strong> palavras</span></div><a href="../${obra.slug || obra.id_obra}/index-obra.html" class="botao-primario">Explorar a obra <span aria-hidden="true">↗</span></a></div>
+                            <div class="acao-obra"><div class="work-facts"><span><strong>${String(obra.total_capitulos).padStart(2, '0')}</strong> capítulos</span><span><strong>${obra.total_palavras.toLocaleString('pt-BR')}</strong> palavras</span></div><a href="${obra.url_publica || '../'+(obra.slug || obra.id_obra)+'/index-obra.html'}" class="botao-primario">Explorar a obra <span aria-hidden="true">↗</span></a></div>
                         </div>
                     </div>
                 </article>`;

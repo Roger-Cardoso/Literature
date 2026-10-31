@@ -1,29 +1,4 @@
 {
   "schema_version": 2,
-  "itens": [
-    {
-      "tipo": "obra",
-      "titulo": "A Lenda do Sertão",
-      "texto": "Quando o sol se recusa a se pôr... Sistema de Magia Rígido Folclore Sobrevivência",
-      "url": "/a-lenda-do-sertao/"
-    },
-    {
-      "tipo": "capitulo",
-      "titulo": "Capitulo 01",
-      "texto": "",
-      "url": "/a-lenda-do-sertao/capitulo-1/"
-    },
-    {
-      "tipo": "capitulo",
-      "titulo": "Capitulo 02",
-      "texto": "",
-      "url": "/a-lenda-do-sertao/capitulo-2/"
-    },
-    {
-      "tipo": "capitulo",
-      "titulo": "Este é o Começo do Céu de Outono",
-      "texto": "",
-      "url": "/a-lenda-do-sertao/capitulo-3/"
-    }
-  ]
+  "itens": []
 }
